@@ -33,6 +33,7 @@ def countries():
     }
     return flask.jsonify(response)
 
+
 @app.route("/search/pois", methods=['POST'])
 def pois():
     queries = request.json["queries"]
@@ -46,7 +47,21 @@ def pois():
     }
     return flask.jsonify(response)
 
+
 @app.route("/search/languages", methods=['POST'])
+def languages():
+    queries = request.json["queries"]
+    countries = request.json["countries"]
+    topics = request.json["poi"]
+    languages = request.json["languages"]
+    tweets = get_tweets_by_languages(queries, countries, topics, languages)
+
+    response = {
+        "response": tweets
+    }
+    return flask.jsonify(response)
+
+@app.route("/search/hashtags", methods=['POST'])
 def languages():
     queries = request.json["queries"]
     countries = request.json["countries"]

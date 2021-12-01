@@ -4,8 +4,14 @@ import json
 import re
 import operator
 
-CORE_NAME = "IRF21_class_demo"
-AWS_IP = "localhost"
+from query_processor import Query_Processor
+
+CORE_NAME = "IRF21P1"
+AWS_IP = "18.118.132.49"
+query_processor = Query_Processor()
+
+# CORE_NAME = "IRF21_class_demo"
+# AWS_IP = "localhost"
 
 
 def clean_tweet(tweet):
@@ -40,14 +46,34 @@ def transform_to_response(docs):
     return response_tweets
 
 
-def get_tweets_from_solr(queries=None, countries=None, topics=None, languages=None):
-    try:
+def get_filter(field_name, value):
+    return '&fq=' + field_name + '%3A' + value
 
+def get_tweets_from_solr(query=None, countries=None, poi_name=None, languages=None, start=None, rows=None):
+    try:
         solr_url = 'http://{AWS_IP}:8983/solr/{CORE_NAME}'.format(AWS_IP=AWS_IP, CORE_NAME=CORE_NAME)
-        solr_url = solr_url + '/select?q.op=OR&q=' + queries + '&rows=20'
-        docs = requests.post(solr_url)
-        if docs is not None and len(docs.response.docs) != 0:
-            docs = docs.response.docs
+        solr_url = solr_url + query_processor.get_query(query)
+        # solr_url = solr_url + '/select?q.op=OR&q=' + query + '&rows=20'
+
+        if countries is not None:
+            solr_url = solr_url + get_filter('country', countries)
+        if poi_name is not None:
+            solr_url = solr_url + get_filter('poi_name', poi_name)
+        if languages is not None:
+            solr_url = solr_url + get_filter('tweet_lang', languages)
+
+        solr_url = solr_url + '&wt=json&indent=true'
+
+        if start is not None:
+            solr_url = solr_url + '&start=' + str(start)
+        if rows is not None:
+            solr_url = solr_url + '&rows=' + str(rows)
+
+        docs = requests.get(solr_url)
+        if docs.status_code == 200:
+            docs = json.loads(docs.content)['response']['docs']
+        # if docs is not None and len(docs.response.docs) != 0:
+        #    docs = docs.response.docs
 
     except Exception as ex:
         print(ex)

@@ -1,7 +1,8 @@
 from flask import Flask
 import flask
 from flask import request
-from views import get_tweets_from_solr, get_tweets_by_countries, get_tweets_by_languages, get_tweets_by_pois
+from views import get_tweets_from_solr, get_tweets_by_countries, get_tweets_by_languages, get_tweets_by_pois, \
+    get_top_hash_tags
 
 app = Flask(__name__)
 
@@ -62,15 +63,15 @@ def languages():
     return flask.jsonify(response)
 
 @app.route("/search/hashtags", methods=['POST'])
-def languages():
+def hashtags():
     queries = request.json["queries"]
     countries = request.json["countries"]
     topics = request.json["poi"]
     languages = request.json["languages"]
-    tweets = get_tweets_by_languages(queries, countries, topics, languages)
+    result = get_top_hash_tags(queries, countries, topics, languages)
 
     response = {
-        "response": tweets
+        "response": result
     }
     return flask.jsonify(response)
 

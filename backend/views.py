@@ -2,6 +2,7 @@ from textblob import TextBlob
 import requests
 import json
 import re
+import operator
 
 CORE_NAME = "IRF21_class_demo"
 AWS_IP = "localhost"
@@ -12,7 +13,7 @@ def clean_tweet(tweet):
 
 
 def read_dummy_data_from_json():
-    with open("data/dummy" + ".json", "r") as file:
+    with open("backend/data/dummy" + ".json", "r") as file:
         data = json.load(file)
     return data
 
@@ -106,3 +107,22 @@ def get_tweets_by_languages(queries=None, countries=None, topics=None, languages
             tweet_response["SPANISH"] += 1
     return tweet_response
 
+
+def get_top_hash_tags(queries=None, countries=None, topics=None, languages=None):
+    tweets = get_tweets_from_solr(queries, countries, topics, languages)
+    hashtags_by_freq = {}
+    for tweet in tweets:
+        if 'hashtags' not in tweet:
+            continue
+        hashtags = tweet['hashtags']
+        count_frequency(hashtags, hashtags_by_freq)
+    result = dict(sorted(hashtags_by_freq.items(), key=operator.itemgetter(1), reverse=True))
+    return result
+
+
+def count_frequency(my_list, hashtags_by_freq):
+    for item in my_list:
+        if item in hashtags_by_freq:
+            hashtags_by_freq[item] += 1
+        else:
+            hashtags_by_freq[item] = 1

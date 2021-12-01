@@ -9,6 +9,7 @@
         "text_en":["Working towards a vibrant health sector."],
         "tweet_urls":["https://t.co/DXeS2iUpvL"],
         "tweet_date":["2021-02-23T06:00:00Z"],
+        "hashtags": ["health"],
         "_version_":1711735866871775233},
       {
         "poi_name":["narendramodi"],
@@ -20,6 +21,7 @@
         "tweet_lang":["en"],
         "text_en":["Improving connectivity and convenience for West Bengal."],
         "tweet_date":["2021-02-22T17:00:00Z"],
+        "hashtags": ["WestBengal"],
         "_version_":1711735866871775234},
       {
         "poi_name":["narendramodi"],
@@ -41,6 +43,7 @@
         "tweet_lang":["en"],
         "text_en":["West Bengal has the potential to be a powerhouse of industry and innovation. A BJP Government in the state will undo the stagnation caused by those parties who ruled the state for years."],
         "tweet_date":["2021-02-22T17:00:00Z"],
+        "hashtags": ["WestBengal"],
         "_version_":1711735866871775236},
       {
         "poi_name":["narendramodi"],
@@ -52,6 +55,7 @@
         "tweet_lang":["hi"],
         "text_hi":["हर घर जल पहुंचाने के लिए केंद्र ने टीएमसी सरकार को 1700 करोड़ रु. से ज्यादा दिए हैं, लेकिन सिर्फ 609 करोड़ रु. ही खर्च किए गए हैं।\nक्या राज्य सरकार को पश्चिम बंगाल की बहनों, बेटियों की परवाह नहीं है।\nक्या बंगाल की बेटी के साथ अन्याय करने वाले लोगों को माफ किया जा सकता है? "],
         "tweet_date":["2021-02-22T17:00:00Z"],
+        "hashtags": [],
         "_version_":1711735866871775237},
       {
         "poi_name":["narendramodi"],
@@ -63,5 +67,6 @@
         "tweet_lang":["en"],
         "text_en":["Those parties who ruled West Bengal for decades did not devote attention towards Hooghlys development. BJP will serve Hooghly with vigour and ensure qualitative development."],
         "tweet_date":["2021-02-22T17:00:00Z"],
+        "hashtags": ["WestBengal"],
         "_version_":1711735866871775238}
 ]

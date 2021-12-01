@@ -9,11 +9,21 @@ app = Flask(__name__)
 
 @app.route("/search", methods=['POST'])
 def search():
-    queries = request.json["queries"]
-    countries = request.json["countries"]
-    topics = request.json["poi"]
-    languages = request.json["languages"]
-    tweets = get_tweets_from_solr(queries, countries, topics, languages)
+    queries = countries = poi_name = languages = start = rows = None
+    if "queries" in request.json:
+        queries = request.json["queries"]
+    if "countries" in request.json:
+        countries = request.json["countries"]
+    if "poi_name" in request.json:
+        poi_name = request.json["poi_name"]
+    if "languages" in request.json:
+         languages = request.json["languages"]
+    if "start" in request.json:
+        start = request.json["start"]
+    if "rows" in request.json:
+        rows = request.json["rows"]
+
+    tweets = get_tweets_from_solr(queries, countries, poi_name, languages, start, rows)
 
     response = {
         "response": tweets

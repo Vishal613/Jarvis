@@ -105,3 +105,4 @@ def get_tweets_by_languages(queries=None, countries=None, topics=None, languages
         elif tweet['tweet_lang'][0] == 'es':
             tweet_response["SPANISH"] += 1
     return tweet_response
+

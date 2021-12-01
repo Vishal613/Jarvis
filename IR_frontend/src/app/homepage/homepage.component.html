@@ -1,0 +1,166 @@
+<html>
+    <head>
+        <base href="/">
+    </head>
+<p>
+    <mat-toolbar color="primary" class="mat-elevation-z8">
+      <!-- <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+        <mat-icon>menu</mat-icon>
+      </button> -->
+      <mat-icon aria-hidden="false" aria-label="Example home icon">group_work</mat-icon>
+      <span>Jarvis</span>&nbsp;&nbsp;
+      <a mat-button routerLink="/home">Home</a>
+      <a mat-button routerLink="/overview_analytics">Overview Analytics</a>
+      
+      <span class="example-spacer"></span>
+      
+    </mat-toolbar>
+  </p>
+  <form class="formGroup">
+    <mat-form-field class="example-full-width" appearance="fill">
+      &nbsp;&nbsp;<mat-label class="font-size" for="query" style="color:azure">Query</mat-label>
+      <input matInput #query name="query" class="font-size" placeholder="Enter query for search" >
+    </mat-form-field>
+    &nbsp;&nbsp;
+     
+    
+      <button type="button" class="btn btn-outline-light btn-lg" formControlName="search" style="width: 13%;" (click)="searchQuery(query.value)">Search</button>
+      <div> 
+        <mat-accordion>
+        <mat-expansion-panel (opened)="panelOpenState = true"
+                       (closed)="panelOpenState = false">
+    <mat-expansion-panel-header>
+      <mat-panel-title style="color: #3f51b5;">
+       Filters
+      </mat-panel-title>
+      <mat-panel-description style="text-align: end; padding-left: 500px;">
+        Currently {{panelOpenState ? 'open' : 'closed'}}
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <mat-form-field appearance="fill">
+      <mat-label>Country</mat-label>
+      <mat-select (selectionChange)="searchCountryFilter($event.value)">
+        <mat-option value="USA">USA</mat-option>
+        <mat-option value="India">India</mat-option>
+        <mat-option value="Mexico">Mexico</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Languages</mat-label>
+      <mat-select (selectionChange)="searchLanguageFilter($event.value)">
+        <mat-option value="en">English</mat-option>
+        <mat-option value="hi">Hindi</mat-option>
+        <mat-option value="es">Spanish</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </mat-expansion-panel>
+</mat-accordion>
+      
+    </div>
+      
+       <div *ngIf="loading">
+        <mat-spinner class="loader"></mat-spinner>
+            <div class="lds-ellipsis"></div>
+       </div>
+       
+
+  </form>
+ 
+  <div *ngIf="tweetsData">
+    <mat-tab-group>
+      <mat-tab label="Tweets" style="color: pink;font-size: 17px;"> 
+        <div class="space"></div>
+        <b><h4 style="color: pink; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;Showing Top {{tweetsDataLength}} Tweets Related to {{searchTerm}}</h4></b>
+        <div *ngFor="let i of tweetsData">
+          <mat-card >
+            <div *ngIf="i['verified']; else notverified">
+              <p style="color: #3f51b5;">@{{i["poi_name"]}}
+               <mat-icon aria-hidden="false" aria-label="Example home icon">check_circle</mat-icon></p>
+            </div> 
+            <ng-template #notverified>
+              <p style="color: #3f51b5;">@{{i["poi_name"]}}</p>
+            </ng-template>
+         
+          <a href="{{i['tweet_urls']}}" target="_blank" rel="noreferrer noopener" style="color: rgb(40, 116, 204);" onclick="window.open(this.href,'_blank'); return false;"> {{i["tweet_urls"]}}</a>
+          <p>{{i["tweet_text"]}}</p>
+          <p><label style="color: #828283;">Country: &nbsp;&nbsp;  </label>{{i["country"]}}</p>
+          <p><label style="color: #828283;">Sentiment Score: &nbsp;&nbsp;  </label>{{i["sentiment_score"]}} </p>
+            <div *ngIf="i['sentiment_result'] == 'positive'">
+            <mat-progress-bar mode="determinate" value="80" id="positive" style="background-color: green !important;"></mat-progress-bar> </div> 
+            <div *ngIf="i['sentiment_result'] == 'negative'">
+              <mat-progress-bar mode="determinate" value="60" id="negative" style="background-color: green !important;"></mat-progress-bar> </div> 
+              <div *ngIf="i['sentiment_result'] == 'neutral'">
+                <mat-progress-bar mode="determinate" value="50" id="neutral" style="background-color: green !important;"></mat-progress-bar> </div> 
+          
+          
+            <p><label style="color: #828283;">Tweeted On: &nbsp;&nbsp; </label>{{i["tweet_date"]}} </p>
+          
+          
+          
+          
+        </mat-card>
+        <div class="space"></div>
+        </div>
+  
+        
+      </mat-tab>
+      <mat-tab label="Analytics" style="color: pink; font-size: 17px;"> 
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-6">
+              <h2 style="color: pink; font-weight: bold; text-align: center;">Number of Tweets vs Countries</h2>
+                <div class="chart-wrapper" style="text-align: center;"> <!-- //Doughnut Chart -->
+                  <canvas baseChart 
+                  [data]="doughnutChartData"
+                  [labels]="doughnutChartLabels"
+                  [colors]="doughnutChartColors"
+                  [chartType]="doughnutChartType"
+                  [options]="lineChartOptions">
+                </canvas>
+              </div>
+              <div style="padding-top: 50px;"></div>
+              <div></div>
+              <h2 style="color: pink; font-weight: bold; text-align: center;">Sentiment Analysis on Tweets</h2>
+              <div class="chart-wrapper">   <!-- //Pie Chart -->
+                <canvas baseChart 
+                [data]="pieChartData" 
+                [labels]="pieChartLabels" 
+                [chartType]="pieChartType"
+                [options]="lineChartOptions"
+                [plugins]="pieChartPlugins"
+                [legend]="pieChartLegend">
+              </canvas>
+            </div>
+      
+            </div>
+            <div class="col-sm-6">
+              <h2 style="color: pink; font-weight: bold; text-align: center;">Tweet Count for each POI</h2>
+               <div style="display: block ;text-align: center">  <!-- //Bar Graph -->
+                    <canvas baseChart 
+                      [datasets]="barChartData"
+                      [labels]="barChartLabels"
+                      [options]="barChartOptions"
+                      [colors]="barChartColors"
+                      [legend]="barChartLegend"
+                      [chartType]="barChartType">
+                    </canvas>
+                </div>
+            </div>
+            
+          </div>
+        </div>
+       
+        
+      
+      </mat-tab>
+      <mat-tab label="Third" style="color: pink; font-size: 17px;"> Content 3 </mat-tab>
+    </mat-tab-group>
+    
+   
+    
+   
+
+  </div>
+
+  </html>

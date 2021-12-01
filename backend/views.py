@@ -10,6 +10,7 @@ CORE_NAME = "IRF21P1"
 AWS_IP = "18.118.132.49"
 query_processor = Query_Processor()
 
+
 # CORE_NAME = "IRF21_class_demo"
 # AWS_IP = "localhost"
 
@@ -19,7 +20,7 @@ def clean_tweet(tweet):
 
 
 def read_dummy_data_from_json():
-    with open("backend/data/dummy" + ".json", "r") as file:
+    with open("data/dummy" + ".json", "r") as file:
         data = json.load(file)
     return data
 
@@ -48,6 +49,7 @@ def transform_to_response(docs):
 
 def get_filter(field_name, value):
     return '&fq=' + field_name + '%3A' + value
+
 
 def get_tweets_from_solr(query=None, countries=None, poi_name=None, languages=None, start=None, rows=None):
     try:
@@ -78,7 +80,8 @@ def get_tweets_from_solr(query=None, countries=None, poi_name=None, languages=No
     except Exception as ex:
         print(ex)
         docs = read_dummy_data_from_json()
-
+    # todo: need to fix the try part
+    docs = read_dummy_data_from_json()
     tweet_response = transform_to_response(docs)
     return tweet_response
 

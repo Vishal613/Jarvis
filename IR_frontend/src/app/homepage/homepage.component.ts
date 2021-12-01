@@ -22,12 +22,18 @@ export class HomepageComponent implements OnInit {
   searchTerm:any;
   countryData1:any;
   countryData2:any;
+  hashtagData1:any;
+  hashtagData2:any;
   doughnutChartLabels:any = [];
   doughnutChartData:any =[];
   doughnutChartType: ChartType = 'doughnut';
   doughnutChartColors: Color[] = [
       { backgroundColor: ['pink','yellow','brown']},
       { hoverBackgroundColor:['red','black','lightblue'] },]
+
+  doughnutChartLabels_hashtag:any = [];
+  doughnutChartData_hashtag:any = [];
+  
 
   public pieChartOptions: ChartOptions = {
         responsive: true,};
@@ -93,7 +99,7 @@ lineChartOptions:any = {
         next:info => {
           this.loading = false;
           console.log("response +" ,info)
-          console.log("just response" + Object.keys(info.response))
+          
 
           this.tweetsData= info.response
           
@@ -164,7 +170,26 @@ lineChartOptions:any = {
           this.countryData2 = this.countryData1.response
           this.doughnutChartLabels = Object.keys(this.countryData2)
           this.doughnutChartData = Object.keys(this.countryData2).map(key => this.countryData2[key]);
-          
+          console.log("bye Country"+ this.doughnutChartData)
+      },
+        
+        error: error => console.log(console.error) 
+      }
+      ); 
+      this.tophashtags();
+  }
+
+
+  tophashtags(){
+    console.log("hi Country")
+    this.appService.tophashtags(this.searchTerm)
+      .subscribe({
+        next:info => {
+          this.hashtagData1= info
+          this.hashtagData2 = this.hashtagData1.response
+          this.doughnutChartLabels_hashtag = Object.keys(this.hashtagData2)
+          this.doughnutChartData_hashtag = Object.keys(this.hashtagData2).map(key => this.hashtagData2[key]);
+          console.log("bye Country"+ this.hashtagData2)
       },
         
         error: error => console.log(console.error) 

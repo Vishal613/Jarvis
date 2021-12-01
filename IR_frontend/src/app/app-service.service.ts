@@ -5,8 +5,9 @@ import { map } from 'rxjs/operators';
 
 
 
-const baseUrl = 'http://192.168.1.122:9999/search'
-const baseUrl2 = ''
+const baseUrl = 'http://192.168.1.220:9999/search'
+const baseUrl2 = 'http://192.168.1.220:9999/search/countries'
+const baseUrl3 = 'http://192.168.1.220:9999/search/hashtags'
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,7 @@ export class AppServiceService {
       const data = {
         "queries": val,
         "countries": "",
-        "poi": "",
+        "poi_name": "",
         "languages": ""
     }
       console.log(data)
@@ -48,11 +49,11 @@ export class AppServiceService {
     const data = {
       "queries": this.queryTerm,
       "countries": val,
-      "poi": this.topicsTerm,
+      "poi_name": this.topicsTerm,
       "languages": this.languagesTerm
   }
     console.log(data)
-    return this.http.post('http://192.168.1.122:9999/search', data);
+    return this.http.post(baseUrl, data);
   }
 
   searchTopicsFilter(val:string): Observable<any>{
@@ -68,11 +69,11 @@ export class AppServiceService {
     const data = {
       "queries": this.queryTerm,
       "countries": this.countryTerm,
-      "poi": val,
+      "poi_name": val,
       "languages": this.languagesTerm
   }
     console.log(data)
-    return this.http.post('http://192.168.1.122:9999/search', data);
+    return this.http.post(baseUrl, data);
   }
 
   searchLanguageFilter(val:string): Observable<any>{
@@ -88,23 +89,36 @@ export class AppServiceService {
     const data = {
       "queries": this.queryTerm,
       "countries": this.countryTerm,
-      "poi": this.topicsTerm,
+      "poi_name": this.topicsTerm,
       "languages": val
   }
     console.log(data)
-    return this.http.post('http://192.168.1.122:9999/search', data);
+    return this.http.post(baseUrl, data);
   }
 
    analysisCountry(val:string){   //doughnut chart for countries vs number of tweets
+    console.log("inside country server " + val)
     const data = {
       "queries": this.queryTerm,
       "countries": "",
       "poi": "",
       "languages": ""
   }
-    console.log("inside server country")
+    console.log(data)
     
-    return this.http.post('http://192.168.1.122:9999/search/countries', data);
+    return this.http.post(baseUrl2, data);
+  }
+
+  tophashtags(val:string){   //doughnut chart for countries vs number of tweets
+    console.log("inside hashtag server " + val)
+    const data = {
+      "queries": this.queryTerm,
+      "countries": "",
+      "poi": "",
+      "languages": ""
+  }
+    
+    return this.http.post(baseUrl3, data);
   }
 
   getOverviewAnanlysis(){

@@ -146,6 +146,16 @@
                       [chartType]="barChartType">
                     </canvas>
                 </div>
+                <h2 style="color: pink; font-weight: bold; text-align: center;">Top Hashtags and their Count</h2>
+                <div class="chart-wrapper" style="text-align: center;"> <!-- //Doughnut Chart -->
+                  <canvas baseChart 
+                  [data]="doughnutChartData_hashtag"
+                  [labels]="doughnutChartLabels_hashtag"
+                  [colors]="doughnutChartColors"
+                  [chartType]="doughnutChartType"
+                  [options]="lineChartOptions">
+                </canvas>
+              </div>
             </div>
             
           </div>

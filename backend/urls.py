@@ -23,7 +23,7 @@ def search():
     if "rows" in request.json:
         rows = request.json["rows"]
 
-    tweets = get_tweets_from_solr(queries, countries, poi_name, languages, start, rows)
+    tweets = get_tweets_from_solr(queries, countries, poi_name, languages, start, rows, False)
 
     response = {
         "response": tweets
@@ -85,6 +85,25 @@ def hashtags():
     }
     return flask.jsonify(response)
 
+@app.route("/topics", methods=['POST'])
+def topics():
+    queries = countries = poi_name = languages = None
+    if "queries" in request.json:
+        queries = request.json["queries"]
+    if "countries" in request.json:
+        countries = request.json["countries"]
+    if "poi_name" in request.json:
+        poi_name = request.json["poi_name"]
+    if "languages" in request.json:
+         languages = request.json["languages"]
+
+
+    docs = get_tweets_from_solr(queries, countries, poi_name, languages, 0, 5000, True)
+    topics = get_topics(docs)
+    response = {
+        "response": topics
+    }
+    return flask.jsonify(response)
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=9999)

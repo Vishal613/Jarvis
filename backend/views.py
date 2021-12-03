@@ -3,7 +3,10 @@ import requests
 import json
 import re
 import operator
-
+import pandas as pd
+import pickle
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
 from query_processor import Query_Processor
 
 CORE_NAME = "IRF21P1"
@@ -46,12 +49,74 @@ def transform_to_response(docs):
         response_tweets.append(doc)
     return response_tweets
 
+def get_stop_words(stop_file_path):    
+    with open(stop_file_path, 'r', encoding="utf-8") as f:
+        stopwords = f.readlines()
+        stop_set = set(m.strip() for m in stopwords)
+        return frozenset(stop_set)
+
+def sort(coo_matrix):
+    tuples = zip(coo_matrix.col, coo_matrix.data)
+    return sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
+
+def extract_topn_from_vector(feature_names, sorted_items, topn=10):
+    """get the feature names and tf-idf score of top n items"""
+    
+    sorted_items = sorted_items[:topn]
+
+    score_vals = []
+    feature_vals = []
+
+    for idx, score in sorted_items:
+        fname = feature_names[idx]
+        score_vals.append(round(score, 3))
+        feature_vals.append(feature_names[idx])
+
+    results= {}
+    for idx in range(len(feature_vals)):
+        results[feature_vals[idx]]=score_vals[idx]
+    
+    return results
+    
+def get_topics(data):
+    
+    data = pd.DataFrame(data)
+    if(len(data)==0): return {}
+    data = data['tweet_text']
+    if(type(data[0]) == list):
+        data = [item for sublist in data for item in sublist]
+
+    stopwords=get_stop_words("final_stopwords.txt")
+
+    cv=CountVectorizer(max_df=0.85,stop_words=stopwords)
+    word_count_vector=cv.fit_transform(data)
+
+    tfidf_transformer=TfidfTransformer(smooth_idf=True,use_idf=True)
+    tfidf_transformer.fit(word_count_vector)
+
+    feature_names=cv.get_feature_names()
+
+    doc=' '.join(data)
+
+    tf_idf_vector=tfidf_transformer.transform(cv.transform([doc]))
+
+    sorted_items=sort(tf_idf_vector.tocoo())
+
+    keywords=extract_topn_from_vector(feature_names,sorted_items,10)
+
+    
+    topics_dict = {}
+    for k in keywords:
+        topics_dict[k] = keywords[k]
+                
+    return topics_dict
+       
 
 def get_filter(field_name, value):
     return '&fq=' + field_name + '%3A' + value
 
 
-def get_tweets_from_solr(query=None, countries=None, poi_name=None, languages=None, start=None, rows=None):
+def get_tweets_from_solr(query=None, countries=None, poi_name=None, languages=None, start=None, rows=None, return_raw_docs = False):
     try:
         solr_url = 'http://{AWS_IP}:8983/solr/{CORE_NAME}'.format(AWS_IP=AWS_IP, CORE_NAME=CORE_NAME)
         solr_url = solr_url + query_processor.get_query(query)
@@ -72,8 +137,11 @@ def get_tweets_from_solr(query=None, countries=None, poi_name=None, languages=No
             solr_url = solr_url + '&rows=' + str(rows)
 
         docs = requests.get(solr_url)
+        topics = {}
         if docs.status_code == 200:
             docs = json.loads(docs.content)['response']['docs']
+            if return_raw_docs == True:
+                return docs
         # if docs is not None and len(docs.response.docs) != 0:
         #    docs = docs.response.docs
 
@@ -81,13 +149,12 @@ def get_tweets_from_solr(query=None, countries=None, poi_name=None, languages=No
         print(ex)
         docs = read_dummy_data_from_json()
     # todo: need to fix the try part
-    docs = read_dummy_data_from_json()
     tweet_response = transform_to_response(docs)
     return tweet_response
 
 
 def get_tweets_by_countries(queries=None, countries=None, topics=None, languages=None):
-    tweets = get_tweets_from_solr(queries, countries, topics, languages)
+    tweets = get_tweets_from_solr(queries, countries, topics, languages, None, None, False)
     tweet_response = {
         "USA": 0,
         "INDIA": 0,
@@ -104,7 +171,7 @@ def get_tweets_by_countries(queries=None, countries=None, topics=None, languages
 
 
 def get_tweets_by_pois(queries=None, countries=None, topics=None, languages=None):
-    tweets = get_tweets_from_solr(queries, countries, topics, languages)
+    tweets = get_tweets_from_solr(queries, countries, topics, languages, None, None, False)
     tweet_response = {
         "USA": 0,
         "INDIA": 0,
@@ -121,7 +188,7 @@ def get_tweets_by_pois(queries=None, countries=None, topics=None, languages=None
 
 
 def get_tweets_by_languages(queries=None, countries=None, topics=None, languages=None):
-    tweets = get_tweets_from_solr(queries, countries, topics, languages)
+    tweets = get_tweets_from_solr(queries, countries, topics, languages, None, None, False)
     tweet_response = {
         "ENGLISH": 0,
         "HINDI": 0,
@@ -138,7 +205,7 @@ def get_tweets_by_languages(queries=None, countries=None, topics=None, languages
 
 
 def get_top_hash_tags(queries=None, countries=None, topics=None, languages=None):
-    tweets = get_tweets_from_solr(queries, countries, topics, languages)
+    tweets = get_tweets_from_solr(queries, countries, topics, languages, None, None, False)
     hashtags_by_freq = {}
     for tweet in tweets:
         if 'hashtags' not in tweet:

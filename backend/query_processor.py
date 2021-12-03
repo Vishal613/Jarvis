@@ -9,8 +9,10 @@ class Query_Processor:
     Convert the given query to other languages (say input in english -> convert to spanish & hindi)
     Build query with high boost to original language and lesser boost for other languages
     '''
-    def get_query(self, text):
+    def get_query(self, text, field_exists = None):
         if text == '*' or text.strip() == '' or text == None:
+            if field_exists != None:
+                return '/select?q.op=OR&q='+field_exists+'%3A%5B*%20TO%20*%5D'
             return '/select?q.op=OR&q=*%3A*'
 
         hashtags = []
@@ -57,9 +59,14 @@ class Query_Processor:
         safe_query_text_es = urllib.parse.quote('(' + text_es + ')', safe='')
         safe_query_text_hi = urllib.parse.quote('(' + text_hi + ')', safe='')
 
-        final_query = '/select?q.op=OR&q=text_en%3A' + safe_query_text_en + '%5E' + str(en_boost) + \
-                      '%20OR%20text_es%3A' + safe_query_text_es + '%5E' + str(es_boost) + \
-                      '%20OR%20text_hi%3A' + safe_query_text_hi + '%5E' + str(hi_boost)
+
+        final_query = '/select?q.op=OR&q='
+        if field_exists != None:
+            final_query = final_query + field_exists + '%3A%5B*%20TO%20*%5D' + '%20AND%20'
+
+        final_query = final_query + 'text_en%3A' + safe_query_text_en + '%5E' + str(en_boost) + \
+                            '%20OR%20text_es%3A' + safe_query_text_es + '%5E' + str(es_boost) + \
+                            '%20OR%20text_hi%3A' + safe_query_text_hi + '%5E' + str(hi_boost)
 
         if len(hashtags) > 0:
             tweet_hashtags = ' '.join(hashtags)
@@ -69,6 +76,7 @@ class Query_Processor:
         final_query = final_query + '%20OR%20tweet_text%3A' + safe_query_text + '%5E' + str(2)
         final_query = final_query + '%20OR%20hashtags%3A' + safe_query_text + '%5E' + str(1)
         # final_query = final_query + '&wt=json&indent=true&rows=20'
+
         return final_query
 
     '''
@@ -94,5 +102,3 @@ class Query_Processor:
 
         return clean_text
 
-query_proc = Query_Processor()
-print(query_proc.clean("Sample.word.text $$qwerty askdajs", 'en'))

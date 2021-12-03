@@ -116,18 +116,18 @@ def get_filter(field_name, value):
     return '&fq=' + field_name + '%3A' + value
 
 
-def get_tweets_from_solr(query=None, countries=None, poi_name=None, languages=None, start=None, rows=None, return_raw_docs = False):
+def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None, start=None, rows=None, return_raw_docs = False, field_exists = None):
     try:
         solr_url = 'http://{AWS_IP}:8983/solr/{CORE_NAME}'.format(AWS_IP=AWS_IP, CORE_NAME=CORE_NAME)
-        solr_url = solr_url + query_processor.get_query(query)
+        solr_url = solr_url + query_processor.get_query(query, field_exists)
         # solr_url = solr_url + '/select?q.op=OR&q=' + query + '&rows=20'
 
-        if countries is not None:
-            solr_url = solr_url + get_filter('country', countries)
+        if country is not None:
+            solr_url = solr_url + get_filter('country', country)
         if poi_name is not None:
             solr_url = solr_url + get_filter('poi_name', poi_name)
-        if languages is not None:
-            solr_url = solr_url + get_filter('tweet_lang', languages)
+        if language is not None:
+            solr_url = solr_url + get_filter('tweet_lang', language)
 
         solr_url = solr_url + '&wt=json&indent=true'
 
@@ -136,19 +136,25 @@ def get_tweets_from_solr(query=None, countries=None, poi_name=None, languages=No
         if rows is not None:
             solr_url = solr_url + '&rows=' + str(rows)
 
+        print("Hitting Solr URL:", solr_url)
         docs = requests.get(solr_url)
+        num_found = 0
         topics = {}
         if docs.status_code == 200:
-            docs = json.loads(docs.content)['response']['docs']
+            docs = json.loads(docs.content)
+            num_found = docs['response']['numFound']
+            print("Found ", str(num_found), "Docs")
+            docs = docs['response']['docs']
             if return_raw_docs == True:
                 return docs
+        else:
+            docs = read_dummy_data_from_json()
         # if docs is not None and len(docs.response.docs) != 0:
         #    docs = docs.response.docs
 
     except Exception as ex:
         print(ex)
         docs = read_dummy_data_from_json()
-    # todo: need to fix the try part
     tweet_response = transform_to_response(docs)
     return tweet_response
 
@@ -222,3 +228,5 @@ def count_frequency(my_list, hashtags_by_freq):
             hashtags_by_freq[item] += 1
         else:
             hashtags_by_freq[item] = 1
+
+print(get_tweets_from_solr("covid",start=0, rows=1, field_exists='reply_text'))

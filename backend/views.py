@@ -49,19 +49,22 @@ def transform_to_response(docs):
         response_tweets.append(doc)
     return response_tweets
 
-def get_stop_words(stop_file_path):    
+
+def get_stop_words(stop_file_path):
     with open(stop_file_path, 'r', encoding="utf-8") as f:
         stopwords = f.readlines()
         stop_set = set(m.strip() for m in stopwords)
         return frozenset(stop_set)
 
+
 def sort(coo_matrix):
     tuples = zip(coo_matrix.col, coo_matrix.data)
     return sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
 
+
 def extract_topn_from_vector(feature_names, sorted_items, topn=10):
     """get the feature names and tf-idf score of top n items"""
-    
+
     sorted_items = sorted_items[:topn]
 
     score_vals = []
@@ -72,51 +75,51 @@ def extract_topn_from_vector(feature_names, sorted_items, topn=10):
         score_vals.append(round(score, 3))
         feature_vals.append(feature_names[idx])
 
-    results= {}
+    results = {}
     for idx in range(len(feature_vals)):
-        results[feature_vals[idx]]=score_vals[idx]
-    
+        results[feature_vals[idx]] = score_vals[idx]
+
     return results
-    
+
+
 def get_topics(data):
-    
     data = pd.DataFrame(data)
-    if(len(data)==0): return {}
+    if (len(data) == 0): return {}
     data = data['tweet_text']
-    if(type(data[0]) == list):
+    if (type(data[0]) == list):
         data = [item for sublist in data for item in sublist]
 
-    stopwords=get_stop_words("final_stopwords.txt")
+    stopwords = get_stop_words("final_stopwords.txt")
 
-    cv=CountVectorizer(max_df=0.85,stop_words=stopwords)
-    word_count_vector=cv.fit_transform(data)
+    cv = CountVectorizer(max_df=0.85, stop_words=stopwords)
+    word_count_vector = cv.fit_transform(data)
 
-    tfidf_transformer=TfidfTransformer(smooth_idf=True,use_idf=True)
+    tfidf_transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
     tfidf_transformer.fit(word_count_vector)
 
-    feature_names=cv.get_feature_names()
+    feature_names = cv.get_feature_names()
 
-    doc=' '.join(data)
+    doc = ' '.join(data)
 
-    tf_idf_vector=tfidf_transformer.transform(cv.transform([doc]))
+    tf_idf_vector = tfidf_transformer.transform(cv.transform([doc]))
 
-    sorted_items=sort(tf_idf_vector.tocoo())
+    sorted_items = sort(tf_idf_vector.tocoo())
 
-    keywords=extract_topn_from_vector(feature_names,sorted_items,10)
+    keywords = extract_topn_from_vector(feature_names, sorted_items, 10)
 
-    
     topics_dict = {}
     for k in keywords:
         topics_dict[k] = keywords[k]
-                
+
     return topics_dict
-       
+
 
 def get_filter(field_name, value):
     return '&fq=' + field_name + '%3A' + value
 
 
-def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None, start=None, rows=None, return_raw_docs = False, field_exists = None):
+def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None, start=None, rows=None,
+                         return_raw_docs=False, field_exists=None):
     try:
         solr_url = 'http://{AWS_IP}:8983/solr/{CORE_NAME}'.format(AWS_IP=AWS_IP, CORE_NAME=CORE_NAME)
         solr_url = solr_url + query_processor.get_query(query, field_exists)
@@ -176,21 +179,21 @@ def get_tweets_by_countries(queries=None, countries=None, topics=None, languages
     return tweet_response
 
 
-def get_tweets_by_pois(queries=None, countries=None, topics=None, languages=None):
-    tweets = get_tweets_from_solr(queries, countries, topics, languages, None, None, False)
+def get_replies_tweets_sentiment(query=None, start=None, rows=None):
+    tweets = get_tweets_from_solr(query, start, rows, False, field_exists='reply_text')
     tweet_response = {
-        "USA": 0,
-        "INDIA": 0,
-        "MEXICO": 0
+        "positive": 0,
+        "negative": 0,
+        "neutral": 0
     }
     for tweet in tweets:
-        if tweet['country'][0] == 'USA':
-            tweet_response["USA"] += 1
-        elif tweet['country'][0] == 'INDIA':
-            tweet_response["INDIA"] += 1
-        elif tweet['country'][0] == 'MEXICO':
-            tweet_response["MEXICO"] += 1
-    return tweet_response
+        if tweet['sentiment_result'] == 'positive':
+            tweet_response["positive"] += 1
+        elif tweet['sentiment_result'] == 'negative':
+            tweet_response["negative"] += 1
+        elif tweet['sentiment_result'] == 'neutral':
+            tweet_response["neutral"] += 1
+    return tweet_response, tweets
 
 
 def get_tweets_by_languages(queries=None, countries=None, topics=None, languages=None):
@@ -229,4 +232,4 @@ def count_frequency(my_list, hashtags_by_freq):
         else:
             hashtags_by_freq[item] = 1
 
-print(get_tweets_from_solr("covid",start=0, rows=1, field_exists='reply_text'))
+# print(get_tweets_from_solr("covid",start=0, rows=10, field_exists='reply_text'))

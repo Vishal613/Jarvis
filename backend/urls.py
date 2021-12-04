@@ -33,11 +33,20 @@ def search():
 
 @app.route("/search/countries", methods=['POST'])
 def countries():
-    queries = request.json["query"]
-    countries = request.json["country"]
-    topics = request.json["poi"]
-    languages = request.json["language"]
-    tweets = get_tweets_by_countries(queries, countries, topics, languages)
+    query = country = poi_name = language = start = rows = None
+    if "query" in request.json:
+        query = request.json["query"]
+    if "country" in request.json:
+        country = request.json["country"]
+    if "poi_name" in request.json:
+        poi_name = request.json["poi_name"]
+    if "language" in request.json:
+        language = request.json["language"]
+    if "start" in request.json:
+        start = request.json["start"]
+    if "rows" in request.json:
+        rows = request.json["rows"]
+    tweets = get_tweets_by_countries(query, country, poi_name, language)
 
     response = {
         "response": tweets
@@ -66,11 +75,20 @@ def pois():
 
 @app.route("/search/languages", methods=['POST'])
 def languages():
-    queries = request.json["query"]
-    countries = request.json["country"]
-    topics = request.json["poi_name"]
-    languages = request.json["language"]
-    tweets = get_tweets_by_languages(queries, countries, topics, languages)
+    query = country = poi_name = language = start = rows = None
+    if "query" in request.json:
+        query = request.json["query"]
+    if "country" in request.json:
+        country = request.json["country"]
+    if "poi_name" in request.json:
+        poi_name = request.json["poi_name"]
+    if "language" in request.json:
+        language = request.json["language"]
+    if "start" in request.json:
+        start = request.json["start"]
+    if "rows" in request.json:
+        rows = request.json["rows"]
+    tweets = get_tweets_by_languages(query, country, poi_name, language)
 
     response = {
         "response": tweets
@@ -80,11 +98,20 @@ def languages():
 
 @app.route("/search/hashtags", methods=['POST'])
 def hashtags():
-    queries = request.json["query"]
-    countries = request.json["country"]
-    topics = request.json["poi_name"]
-    languages = request.json["language"]
-    result = get_top_hash_tags(queries, countries, topics, languages)
+    query = country = poi_name = language = start = rows = None
+    if "query" in request.json:
+        query = request.json["query"]
+    if "country" in request.json:
+        country = request.json["country"]
+    if "poi_name" in request.json:
+        poi_name = request.json["poi_name"]
+    if "language" in request.json:
+        language = request.json["language"]
+    if "start" in request.json:
+        start = request.json["start"]
+    if "rows" in request.json:
+        rows = request.json["rows"]
+    result = get_top_hash_tags(query, country, poi_name, language)
 
     response = {
         "response": result

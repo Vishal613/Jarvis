@@ -173,11 +173,11 @@ def get_tweets_by_countries(queries=None, countries=None, topics=None, languages
         "MEXICO": 0
     }
     for tweet in tweets:
-        if tweet['country'][0] == 'USA':
+        if tweet['country'] == 'USA':
             tweet_response["USA"] += 1
-        elif tweet['country'][0] == 'INDIA':
+        elif tweet['country'] == 'INDIA':
             tweet_response["INDIA"] += 1
-        elif tweet['country'][0] == 'MEXICO':
+        elif tweet['country'] == 'MEXICO':
             tweet_response["MEXICO"] += 1
     return tweet_response
 
@@ -206,25 +206,25 @@ def get_replies_tweets_sentiment(query=None, start=None, rows=None):
     return tweet_response, positive_tweet, negative_tweet
 
 
-def get_tweets_by_languages(queries=None, countries=None, topics=None, languages=None):
-    tweets = get_tweets_from_solr(queries=queries, countries=countries, topics=topics, languages=languages)
+def get_tweets_by_languages(query=None, country=None, poi_name=None, language=None):
+    tweets = get_tweets_from_solr(query=query, country=country, poi_name=poi_name, language=language)
     tweet_response = {
         "ENGLISH": 0,
         "HINDI": 0,
         "SPANISH": 0
     }
     for tweet in tweets:
-        if tweet['tweet_lang'][0] == 'en':
+        if tweet['tweet_lang'] == 'en':
             tweet_response["ENGLISH"] += 1
-        elif tweet['tweet_lang'][0] == 'hi':
+        elif tweet['tweet_lang'] == 'hi':
             tweet_response["HINDI"] += 1
-        elif tweet['tweet_lang'][0] == 'es':
+        elif tweet['tweet_lang'] == 'es':
             tweet_response["SPANISH"] += 1
     return tweet_response
 
 
-def get_top_hash_tags(queries=None, countries=None, topics=None, languages=None):
-    tweets = get_tweets_from_solr(queries, countries, topics, languages, None, None, False)
+def get_top_hash_tags(query=None, country=None, poi_name=None, language=None):
+    tweets = get_tweets_from_solr(query=query, country=country, poi_name=poi_name, language=language)
     hashtags_by_freq = {}
     for tweet in tweets:
         if 'hashtags' not in tweet:

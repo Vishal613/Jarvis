@@ -54,11 +54,12 @@ def pois():
         start = request.json["start"]
     if "rows" in request.json:
         rows = request.json["rows"]
-    tweet_response, tweets = get_replies_tweets_sentiment(query, start, rows)
+    tweet_response, positive_tweet, negative_tweet = get_replies_tweets_sentiment(query, start, rows)
 
     response = {
         "response": tweet_response,
-        "tweets": tweets
+        "positive_tweet": positive_tweet,
+        "negative_tweet": negative_tweet
     }
     return flask.jsonify(response)
 

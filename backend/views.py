@@ -107,7 +107,6 @@ def get_topics(data):
 
     keywords = extract_topn_from_vector(feature_names, sorted_items, 10)
 
-    
     topics_list = []
 
     for k in keywords:
@@ -184,7 +183,9 @@ def get_tweets_by_countries(queries=None, countries=None, topics=None, languages
 
 
 def get_replies_tweets_sentiment(query=None, start=None, rows=None):
-    tweets = get_tweets_from_solr(query, start, rows, False, field_exists='reply_text')
+    tweets = get_tweets_from_solr(query=query, start=start, rows=rows, field_exists='reply_text')
+    negative_tweet = tweets[0]
+    positive_tweet = tweets[0]
     tweet_response = {
         "positive": 0,
         "negative": 0,
@@ -197,11 +198,16 @@ def get_replies_tweets_sentiment(query=None, start=None, rows=None):
             tweet_response["negative"] += 1
         elif tweet['sentiment_result'] == 'neutral':
             tweet_response["neutral"] += 1
-    return tweet_response, tweets
+    for tweet in tweets:
+        if tweet['sentiment_score'] > positive_tweet['sentiment_score']:
+            positive_tweet = tweet
+        if tweet['sentiment_score'] < negative_tweet['sentiment_score']:
+            negative_tweet = tweet
+    return tweet_response, positive_tweet, negative_tweet
 
 
 def get_tweets_by_languages(queries=None, countries=None, topics=None, languages=None):
-    tweets = get_tweets_from_solr(queries, countries, topics, languages, None, None, False)
+    tweets = get_tweets_from_solr(queries=queries, countries=countries, topics=topics, languages=languages)
     tweet_response = {
         "ENGLISH": 0,
         "HINDI": 0,

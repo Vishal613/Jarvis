@@ -128,14 +128,14 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
         solr_url = 'http://{AWS_IP}:8983/solr/{CORE_NAME}'.format(AWS_IP=AWS_IP, CORE_NAME=CORE_NAME)
         solr_url = solr_url + query_processor.get_query(query, field_exists)
         # solr_url = solr_url + '/select?q.op=OR&q=' + query + '&rows=20'
-
-        if country is not None:
+          
+        if country is not None and country != '':
             solr_url = solr_url + get_filter('country', country)
-        if poi_name is not None:
+        if poi_name is not None and poi_name != '':
             solr_url = solr_url + get_filter('poi_name', poi_name)
-        if language is not None:
+        if language is not None and language != '':
             solr_url = solr_url + get_filter('tweet_lang', language)
-
+            
         solr_url = solr_url + '&wt=json&indent=true'
 
         if start is not None:

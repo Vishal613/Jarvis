@@ -107,12 +107,16 @@ def get_topics(data):
 
     keywords = extract_topn_from_vector(feature_names, sorted_items, 10)
 
-    topics_dict = {}
+    
+    topics_list = []
+
     for k in keywords:
-        topics_dict[k] = keywords[k]
+        topics_dict = {}
+        topics_dict['name'] = k
+        topics_dict['weight'] = keywords[k]
+        topics_list.append(topics_dict)
 
-    return topics_dict
-
+    return topics_list
 
 def get_filter(field_name, value):
     return '&fq=' + field_name + '%3A' + value

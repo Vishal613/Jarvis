@@ -3,7 +3,7 @@ import flask
 from flask import request
 from views import get_tweets_from_solr, get_tweets_by_countries, get_tweets_by_languages, get_replies_tweets_sentiment, \
     get_top_hash_tags, get_topics, get_tweets_by_sentiment
-import speech_recognition as sr
+
 app = Flask(__name__)
 
 
@@ -25,9 +25,10 @@ def search():
     if "additional_filters" in request.json:
         additional_filters = request.json["additional_filters"]
 
-    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False, additional_filters = additional_filters)
+    tweets, num_found = get_tweets_from_solr(query, country, poi_name, language, start, rows, False, additional_filters = additional_filters)
 
     response = {
+        "total_num": num_found,
         "response": tweets
     }
     return flask.jsonify(response)
@@ -50,7 +51,7 @@ def countries():
         rows = request.json["rows"]
     if "additional_filters" in request.json:
         additional_filters = request.json["additional_filters"]
-    tweets = get_tweets_by_countries(query, country, poi_name, language, start, rows, additional_filters=additional_filters)
+    tweets,  = get_tweets_by_countries(query, country, poi_name, language, start, rows, additional_filters=additional_filters)
 
     response = {
         "response": tweets
@@ -167,7 +168,8 @@ def topics():
         languages = request.json["language"]
     if "additional_filters" in request.json:
         additional_filters = request.json["additional_filters"]
-    docs = get_tweets_from_solr(queries, countries, poi_name, languages, 0, 5000, True, additional_filters=additional_filters)
+
+    docs,_ = get_tweets_from_solr(queries, countries, poi_name, languages, 0, 5000, True, additional_filters=additional_filters)
     topics = get_topics(docs)
     response = {
         "response": topics
@@ -175,37 +177,5 @@ def topics():
     return flask.jsonify(response)
 
 
-@app.route("/voice", methods=['POST'])
-def voice():
-    list_country = ['india','usa','mexico']
-    list_language = ['hindi','spanish','english']
-    recording = sr.Recognizer()
-    language = ''
-    country = ''
-    with sr.Microphone() as source: 
-        recording.adjust_for_ambient_noise(source)
-        print("Please Say something:")
-        audio = recording.listen(source)
-        try:
-            speech = recording.recognize_google(audio)
-            print("You said: " + speech)
-            li = speech.split(' ')
-            query = list(li)
-            for i in li:
-                if(i.lower() in list_country):
-                    country = i
-                    query.remove(i)
-                if(i.lower() in list_language):
-                    language = i
-                    query.remove(i)
-            query = ' '.join(query)
-            print('query: ',query)
-            print('country: ',country)
-            print('language: ',language)
-            return {'query':query, 'country':country, 'language':language}
-        except Exception as e:
-            print(e)
-            return {}
-        
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=9999)

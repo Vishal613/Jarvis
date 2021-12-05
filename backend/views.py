@@ -172,8 +172,8 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
     return tweet_response
 
 
-def get_tweets_by_countries(queries=None, countries=None, topics=None, languages=None):
-    tweets = get_tweets_from_solr(queries, countries, topics, languages, None, None, False)
+def get_tweets_by_countries(query=None, country=None, poi_name=None, language=None, start=None, rows=None):
+    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False)
     tweet_response = {
         "USA": 0,
         "INDIA": 0,
@@ -189,8 +189,8 @@ def get_tweets_by_countries(queries=None, countries=None, topics=None, languages
     return tweet_response
 
 
-def get_tweets_by_sentiment(queries=None, countries=None, topics=None, languages=None, start=None, rows=None):
-    tweets = get_tweets_from_solr(queries, countries, topics, languages, start, rows, False)
+def get_tweets_by_sentiment(query=None, country=None, poi_name=None, language=None, start=None, rows=None):
+    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False)
     tweet_response = {
         "positive": 0,
         "negative": 0,
@@ -230,8 +230,8 @@ def get_replies_tweets_sentiment(query=None, start=None, rows=None):
     return tweet_response, positive_tweet, negative_tweet
 
 
-def get_tweets_by_languages(query=None, country=None, poi_name=None, language=None):
-    tweets = get_tweets_from_solr(query=query, country=country, poi_name=poi_name, language=language)
+def get_tweets_by_languages(query=None, country=None, poi_name=None, language=None, start=None, rows=None):
+    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False)
     tweet_response = {
         "ENGLISH": 0,
         "HINDI": 0,
@@ -247,8 +247,8 @@ def get_tweets_by_languages(query=None, country=None, poi_name=None, language=No
     return tweet_response
 
 
-def get_top_hash_tags(query=None, country=None, poi_name=None, language=None):
-    tweets = get_tweets_from_solr(query=query, country=country, poi_name=poi_name, language=language)
+def get_top_hash_tags(query=None, country=None, poi_name=None, language=None, start=None, rows=None):
+    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False)
     hashtags_by_freq = {}
     for tweet in tweets:
         if 'hashtags' not in tweet:

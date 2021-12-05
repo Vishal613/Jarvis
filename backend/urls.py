@@ -46,7 +46,7 @@ def countries():
         start = request.json["start"]
     if "rows" in request.json:
         rows = request.json["rows"]
-    tweets = get_tweets_by_countries(query, country, poi_name, language)
+    tweets = get_tweets_by_countries(query, country, poi_name, language, start, rows)
 
     response = {
         "response": tweets
@@ -88,7 +88,7 @@ def languages():
         start = request.json["start"]
     if "rows" in request.json:
         rows = request.json["rows"]
-    tweets = get_tweets_by_languages(query, country, poi_name, language)
+    tweets = get_tweets_by_languages(query, country, poi_name, language, start, rows)
 
     response = {
         "response": tweets
@@ -111,7 +111,7 @@ def hashtags():
         start = request.json["start"]
     if "rows" in request.json:
         rows = request.json["rows"]
-    result = get_top_hash_tags(query, country, poi_name, language)
+    result = get_top_hash_tags(query, country, poi_name, language, start, rows)
 
     response = {
         "response": result

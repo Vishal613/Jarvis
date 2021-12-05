@@ -2,7 +2,7 @@ from flask import Flask
 import flask
 from flask import request
 from views import get_tweets_from_solr, get_tweets_by_countries, get_tweets_by_languages, get_replies_tweets_sentiment, \
-    get_top_hash_tags, get_topics
+    get_top_hash_tags, get_topics, get_tweets_by_sentiment
 
 app = Flask(__name__)
 
@@ -112,6 +112,29 @@ def hashtags():
     if "rows" in request.json:
         rows = request.json["rows"]
     result = get_top_hash_tags(query, country, poi_name, language)
+
+    response = {
+        "response": result
+    }
+    return flask.jsonify(response)
+
+
+@app.route("/search/sentiment", methods=['POST'])
+def sentiment():
+    query = country = poi_name = language = start = rows = None
+    if "query" in request.json:
+        query = request.json["query"]
+    if "country" in request.json:
+        country = request.json["country"]
+    if "poi_name" in request.json:
+        poi_name = request.json["poi_name"]
+    if "language" in request.json:
+        language = request.json["language"]
+    if "start" in request.json:
+        start = request.json["start"]
+    if "rows" in request.json:
+        rows = request.json["rows"]
+    result = get_tweets_by_sentiment(query, country, poi_name, language, start, rows)
 
     response = {
         "response": result

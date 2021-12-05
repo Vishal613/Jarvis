@@ -86,36 +86,42 @@ def get_topics(data):
     data = pd.DataFrame(data)
     if (len(data) == 0): return {}
     data = data['tweet_text']
-    if (type(data[0]) == list):
-        data = [item for sublist in data for item in sublist]
+    print(data)
+    
+    try:
+        if (type(data[0]) == list):
+            data = [item for sublist in data for item in sublist]
 
-    stopwords = get_stop_words("final_stopwords.txt")
+        stopwords = get_stop_words("final_stopwords.txt")
 
-    cv = CountVectorizer(max_df=0.85, stop_words=stopwords)
-    word_count_vector = cv.fit_transform(data)
+        cv = CountVectorizer(max_df=0.85, stop_words=stopwords)
+        word_count_vector = cv.fit_transform(data)
 
-    tfidf_transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
-    tfidf_transformer.fit(word_count_vector)
+        tfidf_transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
+        tfidf_transformer.fit(word_count_vector)
 
-    feature_names = cv.get_feature_names()
+        feature_names = cv.get_feature_names()
 
-    doc = ' '.join(data)
+        doc = ' '.join(data)
 
-    tf_idf_vector = tfidf_transformer.transform(cv.transform([doc]))
+        tf_idf_vector = tfidf_transformer.transform(cv.transform([doc]))
 
-    sorted_items = sort(tf_idf_vector.tocoo())
+        sorted_items = sort(tf_idf_vector.tocoo())
 
-    keywords = extract_topn_from_vector(feature_names, sorted_items, 10)
+        keywords = extract_topn_from_vector(feature_names, sorted_items, 10)
 
-    topics_list = []
+        topics_list = []
 
-    for k in keywords:
-        topics_dict = {}
-        topics_dict['name'] = k
-        topics_dict['weight'] = keywords[k]
-        topics_list.append(topics_dict)
+        for k in keywords:
+            topics_dict = {}
+            topics_dict['name'] = k
+            topics_dict['weight'] = keywords[k]
+            topics_list.append(topics_dict)
 
-    return topics_list
+        return topics_list
+    
+    except Exception as e:
+        return {}
 
 def get_filter(field_name, value):
     return '&fq=' + field_name + '%3A' + value

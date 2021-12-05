@@ -185,6 +185,7 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
     except Exception as ex:
         print(ex)
         # all_docs = read_dummy_data_from_json()
+        all_docs = []
     tweet_response = transform_to_response(all_docs)
     return tweet_response
 

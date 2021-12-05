@@ -35,7 +35,7 @@ def search():
 
 @app.route("/search/countries", methods=['POST'])
 def countries():
-    query = country = poi_name = language = start = rows = None
+    query = country = poi_name = language = start = rows = additional_filters = None
     if "query" in request.json:
         query = request.json["query"]
     if "country" in request.json:
@@ -60,7 +60,7 @@ def countries():
 
 @app.route("/search/replies/sentiment", methods=['POST'])
 def pois():
-    query = country = poi_name = language = start = rows = None
+    query = country = poi_name = language = start = rows = additional_filters = None
     if "query" in request.json:
         query = request.json["query"]
     if "start" in request.json:
@@ -81,7 +81,7 @@ def pois():
 
 @app.route("/search/languages", methods=['POST'])
 def languages():
-    query = country = poi_name = language = start = rows = None
+    query = country = poi_name = language = start = rows = additional_filters = None
     if "query" in request.json:
         query = request.json["query"]
     if "country" in request.json:
@@ -106,7 +106,7 @@ def languages():
 
 @app.route("/search/hashtags", methods=['POST'])
 def hashtags():
-    query = country = poi_name = language = start = rows = None
+    query = country = poi_name = language = start = rows = additional_filters = None
     if "query" in request.json:
         query = request.json["query"]
     if "country" in request.json:
@@ -131,7 +131,7 @@ def hashtags():
 
 @app.route("/search/sentiment", methods=['POST'])
 def sentiment():
-    query = country = poi_name = language = start = rows = None
+    query = country = poi_name = language = start = rows = additional_filters = None
     if "query" in request.json:
         query = request.json["query"]
     if "country" in request.json:
@@ -156,7 +156,7 @@ def sentiment():
 
 @app.route("/topics", methods=['POST'])
 def topics():
-    queries = countries = poi_name = languages = None
+    queries = countries = poi_name = languages = additional_filters = None
     if "query" in request.json:
         queries = request.json["query"]
     if "country" in request.json:

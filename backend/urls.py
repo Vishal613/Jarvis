@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route("/search", methods=['POST'])
 def search():
-    query = country = poi_name = language = start = rows = None
+    query = country = poi_name = language = start = rows = additional_filters = None
     if "query" in request.json:
         query = request.json["query"]
     if "country" in request.json:
@@ -22,8 +22,10 @@ def search():
         start = request.json["start"]
     if "rows" in request.json:
         rows = request.json["rows"]
+    if "additional_filters" in request.json:
+        additional_filters = request.json["additional_filters"]
 
-    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False)
+    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False, additional_filters = additional_filters)
 
     response = {
         "response": tweets
@@ -46,7 +48,9 @@ def countries():
         start = request.json["start"]
     if "rows" in request.json:
         rows = request.json["rows"]
-    tweets = get_tweets_by_countries(query, country, poi_name, language, start, rows)
+    if "additional_filters" in request.json:
+        additional_filters = request.json["additional_filters"]
+    tweets = get_tweets_by_countries(query, country, poi_name, language, start, rows, additional_filters=additional_filters)
 
     response = {
         "response": tweets
@@ -63,7 +67,9 @@ def pois():
         start = request.json["start"]
     if "rows" in request.json:
         rows = request.json["rows"]
-    tweet_response, positive_tweet, negative_tweet = get_replies_tweets_sentiment(query, start, rows)
+    if "additional_filters" in request.json:
+        additional_filters = request.json["additional_filters"]
+    tweet_response, positive_tweet, negative_tweet = get_replies_tweets_sentiment(query, start, rows, additional_filters=additional_filters)
 
     response = {
         "response": tweet_response,
@@ -88,7 +94,9 @@ def languages():
         start = request.json["start"]
     if "rows" in request.json:
         rows = request.json["rows"]
-    tweets = get_tweets_by_languages(query, country, poi_name, language, start, rows)
+    if "additional_filters" in request.json:
+        additional_filters = request.json["additional_filters"]
+    tweets = get_tweets_by_languages(query, country, poi_name, language, start, rows, additional_filters=additional_filters)
 
     response = {
         "response": tweets
@@ -111,7 +119,9 @@ def hashtags():
         start = request.json["start"]
     if "rows" in request.json:
         rows = request.json["rows"]
-    result = get_top_hash_tags(query, country, poi_name, language, start, rows)
+    if "additional_filters" in request.json:
+        additional_filters = request.json["additional_filters"]
+    result = get_top_hash_tags(query, country, poi_name, language, start, rows, additional_filters=additional_filters)
 
     response = {
         "response": result
@@ -134,7 +144,9 @@ def sentiment():
         start = request.json["start"]
     if "rows" in request.json:
         rows = request.json["rows"]
-    result = get_tweets_by_sentiment(query, country, poi_name, language, start, rows)
+    if "additional_filters" in request.json:
+        additional_filters = request.json["additional_filters"]
+    result = get_tweets_by_sentiment(query, country, poi_name, language, start, rows, additional_filters=additional_filters)
 
     response = {
         "response": result
@@ -153,8 +165,9 @@ def topics():
         poi_name = request.json["poi_name"]
     if "language" in request.json:
         languages = request.json["language"]
-
-    docs = get_tweets_from_solr(queries, countries, poi_name, languages, 0, 5000, True)
+    if "additional_filters" in request.json:
+        additional_filters = request.json["additional_filters"]
+    docs = get_tweets_from_solr(queries, countries, poi_name, languages, 0, 5000, True, additional_filters=additional_filters)
     topics = get_topics(docs)
     response = {
         "response": topics

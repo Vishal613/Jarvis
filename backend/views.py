@@ -108,7 +108,7 @@ def get_topics(data):
 
         sorted_items = sort(tf_idf_vector.tocoo())
 
-        keywords = extract_topn_from_vector(feature_names, sorted_items, 10)
+        keywords = extract_topn_from_vector(feature_names, sorted_items, 20)
 
         topics_list = []
 

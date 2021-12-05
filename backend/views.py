@@ -98,7 +98,7 @@ def get_topics(data):
 
         stopwords = get_stop_words("final_stopwords.txt")
 
-        cv = CountVectorizer(max_df=0.85, stop_words=stopwords, ngram_range=(1, 2))
+        cv = CountVectorizer(max_df=0.85, stop_words=stopwords)
         word_count_vector = cv.fit_transform(data)
 
         tfidf_transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
@@ -180,7 +180,7 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
             print("Found ", str(num_found), "Docs")
             # docs = docs['response']['docs']
             if return_raw_docs == True:
-                return all_docs
+                return all_docs, num_found
         else:
             all_docs = []
         # if docs is not None and len(docs.response.docs) != 0:
@@ -191,11 +191,11 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
         # all_docs = read_dummy_data_from_json()
         all_docs = []
     # tweet_response = transform_to_response(all_docs)
-    return all_docs
+    return all_docs, num_found
 
 
 def get_tweets_by_countries(query=None, country=None, poi_name=None, language=None, start=None, rows=None, additional_filters=None):
-    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, True, fetch_all=True, additional_filters=additional_filters)
+    tweets, num_found = get_tweets_from_solr(query, country, poi_name, language, start, rows, True, fetch_all=True, additional_filters=additional_filters)
     tweet_response = {
         "USA": 0,
         "INDIA": 0,
@@ -212,7 +212,7 @@ def get_tweets_by_countries(query=None, country=None, poi_name=None, language=No
 
 
 def get_tweets_by_sentiment(query=None, country=None, poi_name=None, language=None, start=None, rows=None, additional_filters=None):
-    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False, fetch_all=True, additional_filters=additional_filters)
+    tweets, num_found = get_tweets_from_solr(query, country, poi_name, language, start, rows, False, fetch_all=True, additional_filters=additional_filters)
     tweet_response = {
         "positive": 0,
         "negative": 0,
@@ -229,7 +229,7 @@ def get_tweets_by_sentiment(query=None, country=None, poi_name=None, language=No
 
 
 def get_replies_tweets_sentiment(query=None, start=None, rows=None, additional_filters=None):
-    tweets = get_tweets_from_solr(query=query, start=start, rows=rows, field_exists='reply_text', fetch_all=True, additional_filters=additional_filters)
+    tweets, num_found = get_tweets_from_solr(query=query, start=start, rows=rows, field_exists='reply_text', fetch_all=True, additional_filters=additional_filters)
     negative_tweet = tweets[0]
     positive_tweet = tweets[0]
     tweet_response = {
@@ -253,7 +253,7 @@ def get_replies_tweets_sentiment(query=None, start=None, rows=None, additional_f
 
 
 def get_tweets_by_languages(query=None, country=None, poi_name=None, language=None, start=None, rows=None, additional_filters=None):
-    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, return_raw_docs=True, fetch_all=True, additional_filters=additional_filters)
+    tweets, num_found = get_tweets_from_solr(query, country, poi_name, language, start, rows, return_raw_docs=True, fetch_all=True, additional_filters=additional_filters)
     tweet_response = {
         "ENGLISH": 0,
         "HINDI": 0,
@@ -270,7 +270,7 @@ def get_tweets_by_languages(query=None, country=None, poi_name=None, language=No
 
 
 def get_top_hash_tags(query=None, country=None, poi_name=None, language=None, start=None, rows=None, additional_filters=None):
-    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, True, fetch_all=True, additional_filters=additional_filters)
+    tweets, num_found = get_tweets_from_solr(query, country, poi_name, language, start, 100, True, fetch_all=False, additional_filters=additional_filters)
     hashtags_by_freq = {}
     for tweet in tweets:
         if 'hashtags' not in tweet:
@@ -278,7 +278,12 @@ def get_top_hash_tags(query=None, country=None, poi_name=None, language=None, st
         hashtags = tweet['hashtags']
         count_frequency(hashtags, hashtags_by_freq)
     result = dict(sorted(hashtags_by_freq.items(), key=operator.itemgetter(1), reverse=True))
-    return result
+    top_10_hashtags = {}
+    for key in result.keys():
+        top_10_hashtags[key] = result[key]
+        if len(top_10_hashtags) == 10:
+            break
+    return top_10_hashtags
 
 
 def count_frequency(my_list, hashtags_by_freq):

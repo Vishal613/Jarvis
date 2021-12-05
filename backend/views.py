@@ -9,8 +9,12 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from query_processor import Query_Processor
 
-CORE_NAME = "IRF21P1"
-AWS_IP = "18.118.132.49"
+# CORE_NAME = "IRF21P4"
+# AWS_IP = "18.118.132.49"
+
+CORE_NAME = "Project4"
+AWS_IP = "18.118.138.7"
+
 query_processor = Query_Processor()
 
 
@@ -27,7 +31,7 @@ def read_dummy_data_from_json():
         data = json.load(file)
     return data
 
-
+'''
 def get_tweet_sentiment(tweet):
     # create TextBlob object of passed tweet text
     text = clean_tweet(tweet['tweet_text'])
@@ -48,7 +52,7 @@ def transform_to_response(docs):
         doc['sentiment_score'] = sentiment_score
         response_tweets.append(doc)
     return response_tweets
-
+'''
 
 def get_stop_words(stop_file_path):
     with open(stop_file_path, 'r', encoding="utf-8") as f:
@@ -149,9 +153,9 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
 
         solr_url = solr_url + '&wt=json&indent=true'
 
-        if start is not None:
+        if start is not None and not fetch_all:
             solr_url = solr_url + '&start=' + str(start)
-        if rows is not None:
+        if rows is not None and not fetch_all:
             solr_url = solr_url + '&rows=' + str(rows)
         print("Hitting Solr URL:", solr_url)
         docs = requests.get(solr_url)
@@ -165,10 +169,10 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
 
             if fetch_all and len(all_docs) < num_found:
                 start = len(all_docs) + 1
-                rows = 2000
-                updated_solr_url = solr_url + '&start=' + str(start)
-                updated_solr_url = updated_solr_url + '&rows=' + str(rows)
+                rows = 2500
                 while len(all_docs) < num_found:
+                    updated_solr_url = solr_url + '&start=' + str(start)
+                    updated_solr_url = updated_solr_url + '&rows=' + str(rows)
                     docs = requests.get(updated_solr_url)
                     docs = json.loads(docs.content)
                     all_docs.extend(docs['response']['docs'])
@@ -177,8 +181,8 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
             # docs = docs['response']['docs']
             if return_raw_docs == True:
                 return all_docs
-        # else:
-            # docs = read_dummy_data_from_json()
+        else:
+            all_docs = []
         # if docs is not None and len(docs.response.docs) != 0:
         #    docs = docs.response.docs
 
@@ -186,8 +190,8 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
         print(ex)
         # all_docs = read_dummy_data_from_json()
         all_docs = []
-    tweet_response = transform_to_response(all_docs)
-    return tweet_response
+    # tweet_response = transform_to_response(all_docs)
+    return all_docs
 
 
 def get_tweets_by_countries(query=None, country=None, poi_name=None, language=None, start=None, rows=None, additional_filters=None):

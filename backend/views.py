@@ -98,7 +98,7 @@ def get_topics(data):
 
         stopwords = get_stop_words("final_stopwords.txt")
 
-        cv = CountVectorizer(max_df=0.85, stop_words=stopwords)
+        cv = CountVectorizer(max_df=0.85, stop_words=stopwords, ngram_range=(1, 2))
         word_count_vector = cv.fit_transform(data)
 
         tfidf_transformer = TfidfTransformer(smooth_idf=True, use_idf=True)

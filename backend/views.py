@@ -87,7 +87,7 @@ def get_topics(data):
     if (len(data) == 0): return {}
     data = data['tweet_text']
     print(data)
-    
+
     try:
         if (type(data[0]) == list):
             data = [item for sublist in data for item in sublist]
@@ -119,7 +119,7 @@ def get_topics(data):
             topics_list.append(topics_dict)
 
         return topics_list
-    
+
     except Exception as e:
         return {}
 
@@ -128,8 +128,7 @@ def get_filter(field_name, value):
     return '&fq=' + field_name + '%3A' + value
 
 
-def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None, start=None, rows=None,
-                         return_raw_docs=False, field_exists=None):
+def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None, start=None, rows=None, return_raw_docs=False, field_exists=None, additional_filters = None, fetch_all = False):
     try:
         solr_url = 'http://{AWS_IP}:8983/solr/{CORE_NAME}'.format(AWS_IP=AWS_IP, CORE_NAME=CORE_NAME)
         solr_url = solr_url + query_processor.get_query(query, field_exists)
@@ -142,38 +141,56 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
         if language is not None and language != '':
             solr_url = solr_url + get_filter('tweet_lang', language)
 
+        if additional_filters is not None and len(additional_filters) > 0:
+            for filter in additional_filters:
+                field_name = filter.split(':')[0]
+                field_value = filter.split(':')[1]
+                solr_url = solr_url + get_filter(field_name, field_value)
+
         solr_url = solr_url + '&wt=json&indent=true'
 
         if start is not None:
             solr_url = solr_url + '&start=' + str(start)
         if rows is not None:
             solr_url = solr_url + '&rows=' + str(rows)
-
         print("Hitting Solr URL:", solr_url)
         docs = requests.get(solr_url)
         num_found = 0
-        topics = {}
+        all_docs = []
+
         if docs.status_code == 200:
             docs = json.loads(docs.content)
             num_found = docs['response']['numFound']
+            all_docs.extend(docs['response']['docs'])
+
+            if fetch_all and len(all_docs) < num_found:
+                start = len(all_docs) + 1
+                rows = 2000
+                updated_solr_url = solr_url + '&start=' + str(start)
+                updated_solr_url = updated_solr_url + '&rows=' + str(rows)
+                while len(all_docs) < num_found:
+                    docs = requests.get(updated_solr_url)
+                    docs = json.loads(docs.content)
+                    all_docs.extend(docs['response']['docs'])
+
             print("Found ", str(num_found), "Docs")
-            docs = docs['response']['docs']
+            # docs = docs['response']['docs']
             if return_raw_docs == True:
-                return docs
-        else:
-            docs = read_dummy_data_from_json()
+                return all_docs
+        # else:
+            # docs = read_dummy_data_from_json()
         # if docs is not None and len(docs.response.docs) != 0:
         #    docs = docs.response.docs
 
     except Exception as ex:
         print(ex)
-        docs = read_dummy_data_from_json()
-    tweet_response = transform_to_response(docs)
+        # all_docs = read_dummy_data_from_json()
+    tweet_response = transform_to_response(all_docs)
     return tweet_response
 
 
-def get_tweets_by_countries(query=None, country=None, poi_name=None, language=None, start=None, rows=None):
-    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False)
+def get_tweets_by_countries(query=None, country=None, poi_name=None, language=None, start=None, rows=None, additional_filters=None):
+    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, True, fetch_all=True, additional_filters=additional_filters)
     tweet_response = {
         "USA": 0,
         "INDIA": 0,
@@ -189,8 +206,8 @@ def get_tweets_by_countries(query=None, country=None, poi_name=None, language=No
     return tweet_response
 
 
-def get_tweets_by_sentiment(query=None, country=None, poi_name=None, language=None, start=None, rows=None):
-    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False)
+def get_tweets_by_sentiment(query=None, country=None, poi_name=None, language=None, start=None, rows=None, additional_filters=None):
+    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False, fetch_all=True, additional_filters=additional_filters)
     tweet_response = {
         "positive": 0,
         "negative": 0,
@@ -206,8 +223,8 @@ def get_tweets_by_sentiment(query=None, country=None, poi_name=None, language=No
     return tweet_response
 
 
-def get_replies_tweets_sentiment(query=None, start=None, rows=None):
-    tweets = get_tweets_from_solr(query=query, start=start, rows=rows, field_exists='reply_text')
+def get_replies_tweets_sentiment(query=None, start=None, rows=None, additional_filters=None):
+    tweets = get_tweets_from_solr(query=query, start=start, rows=rows, field_exists='reply_text', fetch_all=True, additional_filters=additional_filters)
     negative_tweet = tweets[0]
     positive_tweet = tweets[0]
     tweet_response = {
@@ -230,8 +247,8 @@ def get_replies_tweets_sentiment(query=None, start=None, rows=None):
     return tweet_response, positive_tweet, negative_tweet
 
 
-def get_tweets_by_languages(query=None, country=None, poi_name=None, language=None, start=None, rows=None):
-    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False)
+def get_tweets_by_languages(query=None, country=None, poi_name=None, language=None, start=None, rows=None, additional_filters=None):
+    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, return_raw_docs=True, fetch_all=True, additional_filters=additional_filters)
     tweet_response = {
         "ENGLISH": 0,
         "HINDI": 0,
@@ -247,8 +264,8 @@ def get_tweets_by_languages(query=None, country=None, poi_name=None, language=No
     return tweet_response
 
 
-def get_top_hash_tags(query=None, country=None, poi_name=None, language=None, start=None, rows=None):
-    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, False)
+def get_top_hash_tags(query=None, country=None, poi_name=None, language=None, start=None, rows=None, additional_filters=None):
+    tweets = get_tweets_from_solr(query, country, poi_name, language, start, rows, True, fetch_all=True, additional_filters=additional_filters)
     hashtags_by_freq = {}
     for tweet in tweets:
         if 'hashtags' not in tweet:

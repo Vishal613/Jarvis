@@ -15,8 +15,10 @@ from query_processor import Query_Processor
 CORE_NAME = "Project4"
 AWS_IP = "18.118.138.7"
 
-query_processor = Query_Processor()
+DIS_INFO_CORE_NAME = "DIS_INFO"
+DIS_INFO_AWS_IP = "18.118.132.49"
 
+query_processor = Query_Processor()
 
 # CORE_NAME = "IRF21_class_demo"
 # AWS_IP = "localhost"
@@ -135,6 +137,12 @@ def get_filter(field_name, value):
 def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None, start=None, rows=None, return_raw_docs=False, field_exists=None, additional_filters = None, fetch_all = False):
     try:
         solr_url = 'http://{AWS_IP}:8983/solr/{CORE_NAME}'.format(AWS_IP=AWS_IP, CORE_NAME=CORE_NAME)
+
+        if additional_filters != None and len(additional_filters) > 0:
+            for filter in additional_filters:
+                if 'dis_info' in filter:
+                    solr_url = 'http://{AWS_IP}:8983/solr/{CORE_NAME}'.format(AWS_IP=DIS_INFO_AWS_IP, CORE_NAME=DIS_INFO_CORE_NAME)
+
         solr_url = solr_url + query_processor.get_query(query, field_exists)
         # solr_url = solr_url + '/select?q.op=OR&q=' + query + '&rows=20'
 
@@ -147,9 +155,10 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
 
         if additional_filters is not None and len(additional_filters) > 0:
             for filter in additional_filters:
-                field_name = filter.split(':')[0]
-                field_value = filter.split(':')[1]
-                solr_url = solr_url + get_filter(field_name, field_value)
+                if 'dis_info' not in filter:
+                    field_name = filter.split(':')[0]
+                    field_value = filter.split(':')[1]
+                    solr_url = solr_url + get_filter(field_name, field_value)
 
         solr_url = solr_url + '&wt=json&indent=true'
 
@@ -190,6 +199,7 @@ def get_tweets_from_solr(query=None, country=None, poi_name=None, language=None,
         print(ex)
         # all_docs = read_dummy_data_from_json()
         all_docs = []
+        num_found = 0
     # tweet_response = transform_to_response(all_docs)
     return all_docs, num_found
 

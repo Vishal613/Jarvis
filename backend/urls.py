@@ -176,6 +176,37 @@ def topics():
     }
     return flask.jsonify(response)
 
+@app.route("/voice", methods=['POST'])
+def voice():
+    list_country = ['india','usa','mexico']
+    list_language = ['hindi','spanish','english']
+    recording = sr.Recognizer()
+    language = ''
+    country = ''
+    with sr.Microphone() as source: 
+        recording.adjust_for_ambient_noise(source)
+        print("Please Say something:")
+        audio = recording.listen(source)
+        try:
+            speech = recording.recognize_google(audio)
+            print("You said: " + speech)
+            li = speech.split(' ')
+            query = list(li)
+            for i in li:
+                if(i.lower() in list_country):
+                    country = i
+                    query.remove(i)
+                if(i.lower() in list_language):
+                    language = i
+                    query.remove(i)
+            query = ' '.join(query)
+            print('query: ',query)
+            print('country: ',country)
+            print('language: ',language)
+            return {'query':query, 'country':country, 'language':language}
+        except Exception as e:
+            print(e)
+            return {}
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=9999)

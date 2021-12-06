@@ -8,8 +8,8 @@
       <!-- <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
         <mat-icon>menu</mat-icon>
       </button> -->
-      <mat-icon aria-hidden="false" aria-label="Example home icon">home</mat-icon>
-      <span>My App</span>&nbsp;&nbsp;
+      <mat-icon aria-hidden="false" aria-label="Example home icon">group_work</mat-icon>
+      <span>Jarvis</span>&nbsp;&nbsp;
       <a mat-button routerLink="/home">Home</a>
       <a mat-button routerLink="/overview_analytics">Overview Analytics</a>
       
@@ -17,5 +17,58 @@
       
     </mat-toolbar>
   </p>
-  <p>analytics works!</p>
+  <h2 style="color: pink; font-weight: bold; text-align: center;">Topics and their Importance</h2>
+  
+               <div style="display: block ;text-align: center">  
+                    <canvas baseChart 
+                      [datasets]="barChartData"
+                      [labels]="barChartLabels"
+                      [options]="barChartOptions"
+                      [colors]="barChartColors"
+                      [legend]="barChartLegend"
+                      [chartType]="barChartType">
+                    </canvas>
+                </div>
+                <div style="padding-top: 50px;"></div>
+  <div class="container">
+    <div class="row">
+  <div class="col-sm-6">
+    <h2 style="color: pink; font-weight: bold; ">&nbsp;&nbsp;&nbsp;Country Statistics</h2>
+    <div id="chart-pie"></div>
+              <!-- <div class="chart-wrapper">  
+                <canvas baseChart id="pieChartCountry"
+                [data]="pieChartData" 
+                [labels]="pieChartLabels" 
+                [chartType]="pieChartType"
+                [options]="pieChartOptions"
+                [plugins]="pieChartPlugins"
+                [legend]="pieChartLegend">
+              </canvas>
+            </div>--></div> 
+            <div class="col-sm-6">
+          <h2 style="color: pink; font-weight: bold; ">&nbsp;&nbsp;&nbsp;Distribution of Tweets based on Languages</h2>
+            <div class="chart-wrapper">
+              <canvas baseChart id="pieChartCountry"
+              [data]="doughnutChartData"
+              [labels]="doughnutChartLabels"
+              [colors]="doughnutChartColors"
+              [options]="pieChartOptions"
+              [chartType]="doughnutChartType">
+            </canvas>
+          </div>
+            </div>
+          </div>
+          </div>
+         
+            <div>
+    <h2 style="color: pink; font-weight: bold;">&nbsp;&nbsp;&nbsp;POIs and their Tweet Counts</h2>
+  <div class="chart-wrapper">
+    <canvas baseChart
+    [datasets]="radarChartData"
+    [options]="radarChartOptions"
+    [labels]="radarChartLabels"
+    [chartType]="radarChartType">
+  </canvas>
+</div>
+</div>
   </html>

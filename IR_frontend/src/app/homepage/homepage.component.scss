@@ -8,14 +8,17 @@ input[type=text], select {
     box-sizing: border-box;
   }
 
-  a:hover{
-    color: white !important;
-  }
+  // a:hover{
+  //   color: white !important;
+  // }
 
   .mat-card{
-    background-color: #f8f9fa;
+    background-color: white;
     margin-left: 15px;
     margin-right: 15px;
+  }
+  .mat-card:hover{
+    background-color:#c0e7fa;
   }
   .space{
     padding-bottom: 10px;
@@ -40,9 +43,9 @@ input[type=text], select {
   color: #3f51b5 !important;
   
 }
-.mat-card a:hover{
-  color:rgb(40, 116, 204) !important;
-}
+// .mat-card a:hover{
+//   color:#d6f1ff !important;
+// }
 .btn-primary{
   background-color: #3f51b5 !important;
   border-color: #3f51b5 !important;
@@ -56,4 +59,33 @@ input[type=text], select {
 canvas{
   width: 680px !important;
   height: 420px !important;
+}
+
+#wordcloud{
+  width: 1200px !important;
+  height: 390px !important;
+      /* fill: transparent !important; */
+  fill: rgb(110, 7, 110) !important;
+  margin-left: 104px !important;
+}
+
+canvas #doughnut{
+  width: 885px !important;
+  height: 461px !important;
+}
+
+.btn-secondary.active{
+  background-color: aqua;
+  color: black;
+  border-color: #c0e7fa;
+  border-radius: 0 !important;
+  margin-left: 2px;
+}
+
+.btn-secondary {
+  color: black;
+  background-color: white;
+  border-color: #c0e7fa;
+  border-radius: 0 !important;
+  margin-left: 2px;
 }

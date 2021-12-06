@@ -9,7 +9,7 @@
       </button> -->
       <mat-icon aria-hidden="false" aria-label="Example home icon">group_work</mat-icon>
       <span>Jarvis</span>&nbsp;&nbsp;
-      <a mat-button routerLink="/home">Home</a>
+      <a mat-button onclick="window.location.reload();">Home</a>
       <a mat-button routerLink="/overview_analytics">Overview Analytics</a>
       
       <span class="example-spacer"></span>
@@ -23,8 +23,8 @@
     </mat-form-field>
     &nbsp;&nbsp;
      
-    
-      <button type="button" class="btn btn-outline-light btn-lg" formControlName="search" style="width: 13%;" (click)="searchQuery(query.value)">Search</button>
+      
+      <button type="button" class="btn btn-outline-light btn-lg" formControlName="search" style="width: 13%;" (click)="searchQuery(query.value,0)">Search</button>
       <div> 
         <mat-accordion>
         <mat-expansion-panel (opened)="panelOpenState = true"
@@ -41,8 +41,8 @@
       <mat-label>Country</mat-label>
       <mat-select (selectionChange)="searchCountryFilter($event.value)">
         <mat-option value="USA">USA</mat-option>
-        <mat-option value="India">India</mat-option>
-        <mat-option value="Mexico">Mexico</mat-option>
+        <mat-option value="INDIA">India</mat-option>
+        <mat-option value="MEXICO">Mexico</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -52,6 +52,35 @@
         <mat-option value="en">English</mat-option>
         <mat-option value="hi">Hindi</mat-option>
         <mat-option value="es">Spanish</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>POIs</mat-label>
+      <mat-select (selectionChange)="searchPoiFilter($event.value)">
+        <mat-option value="AOC">AOC</mat-option>
+        <mat-option value="AlejandroPoire">Alejandro Poire</mat-option>
+        <mat-option value="AmitShah">Amit Shah</mat-option>
+        <mat-option value="ArvindKejriwal">Arvind Kejriwal</mat-option>
+        <mat-option value="BernieSanders">BernieSanders</mat-option>
+        <mat-option value="CDCgov">CDCgov</mat-option>
+        <mat-option value="Claudiashein">Claudia shein</mat-option>
+        <mat-option value="GOPLeader">GOPLeader</mat-option>
+        <mat-option value="HHSGov">HHSGov</mat-option>
+        <mat-option value="HLGatell">HLGatell</mat-option>
+        <mat-option value="JoeBiden">Joe Biden</mat-option>
+        <mat-option value="JohnKerry">John Kerry</mat-option>
+        <mat-option value="KamalaHarris">Kamala Harris</mat-option>
+        <mat-option value="Mike_Pence">Mike_Pence</mat-option>
+        <mat-option value="MoHFW_INDIA">MoHFW_INDIA</mat-option>
+        <mat-option value="RahulGandhi">Rahul Gandhi</mat-option>
+        <mat-option value="SSalud_mx">SSalud_mx</mat-option>
+        <mat-option value="ShashiTharoor">Shashi Tharoor</mat-option>
+        <mat-option value="alfredodelmazo">alfredodelmazo</mat-option>
+        <mat-option value="lopezobrador_">lopezobrador_</mat-option>
+        <mat-option value="m_ebrard">m_ebrard</mat-option>
+        <mat-option value="narendramodi">narendra modi</mat-option>
+        <mat-option value="nsitharaman">nsitharaman</mat-option>
       </mat-select>
     </mat-form-field>
   </mat-expansion-panel>
@@ -68,22 +97,37 @@
   </form>
  
   <div *ngIf="tweetsData">
-    <mat-tab-group>
+    <mat-tab-group (selectedTabChange)="tabClick($event)">
       <mat-tab label="Tweets" style="color: pink;font-size: 17px;"> 
         <div class="space"></div>
         <b><h4 style="color: pink; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;Showing Top {{tweetsDataLength}} Tweets Related to {{searchTerm}}</h4></b>
+        <div style="margin-left: 15px !important;  margin-bottom: 10px;" (click)="onButtonGroupClick($event)">
+          <button type="button" [disabled]="previousDisabled" class="btn btn-secondary" (click)="searchQuery(searchTerm,start-20)">Previous</button>
+          <button type="button" class="btn btn-secondary active" (click)="searchQuery(searchTerm,0)">1</button>
+          <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,20)">2</button>
+          <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,40)">3</button>
+          <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,60)">4</button>
+          <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,80)">5</button>
+          <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,100)">6</button>
+          <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,120)">7</button>
+          <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,140)">8</button>
+          <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,160)">9</button>
+          <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,180)">10</button>
+          <button type="button" [disabled]="nextDisabled" class="btn btn-secondary" (click)="searchQuery(searchTerm,start+20)">Next</button></div>
         <div *ngFor="let i of tweetsData">
-          <mat-card >
+          <mat-card (click)="openTwitter(i['poi_name'], i['id'])" >
             <div *ngIf="i['verified']; else notverified">
-              <p style="color: #3f51b5;">@{{i["poi_name"]}}
+              <div *ngIf="i['poi_name']">
+              <p style="color: #3f51b5;">{{i["poi_name"]}}
                <mat-icon aria-hidden="false" aria-label="Example home icon">check_circle</mat-icon></p>
+              </div>
             </div> 
             <ng-template #notverified>
-              <p style="color: #3f51b5;">@{{i["poi_name"]}}</p>
+              <p style="color: #3f51b5;">{{i["poi_name"]}}</p>
             </ng-template>
          
+          <p><label style="color: #828283;">Tweet Text: &nbsp;&nbsp;  </label>{{i["tweet_text"]}}</p>
           <a href="{{i['tweet_urls']}}" target="_blank" rel="noreferrer noopener" style="color: rgb(40, 116, 204);" onclick="window.open(this.href,'_blank'); return false;"> {{i["tweet_urls"]}}</a>
-          <p>{{i["tweet_text"]}}</p>
           <p><label style="color: #828283;">Country: &nbsp;&nbsp;  </label>{{i["country"]}}</p>
           <p><label style="color: #828283;">Sentiment Score: &nbsp;&nbsp;  </label>{{i["sentiment_score"]}} </p>
             <div *ngIf="i['sentiment_result'] == 'positive'">
@@ -106,6 +150,8 @@
         
       </mat-tab>
       <mat-tab label="Analytics" style="color: pink; font-size: 17px;"> 
+        <h2 style="color: pink; font-weight: bold; text-align:left;padding-left :12px; ;">Analytics on {{totalNum}} tweets</h2>
+        <div style="padding-top: 30px;"></div>
         <div class="container">
           <div class="row">
             <div class="col-sm-6">
@@ -121,8 +167,8 @@
               </div>
               <div style="padding-top: 50px;"></div>
               <div></div>
-              <h2 style="color: pink; font-weight: bold; text-align: center;">Sentiment Analysis on Tweets</h2>
-              <div class="chart-wrapper">   <!-- //Pie Chart -->
+              <!-- <h2 style="color: pink; font-weight: bold; text-align: center;">Sentiment Analysis on Tweets</h2> -->
+              <!-- <div class="chart-wrapper">  
                 <canvas baseChart 
                 [data]="pieChartData" 
                 [labels]="pieChartLabels" 
@@ -131,40 +177,78 @@
                 [plugins]="pieChartPlugins"
                 [legend]="pieChartLegend">
               </canvas>
-            </div>
+            </div> -->
       
             </div>
             <div class="col-sm-6">
-              <h2 style="color: pink; font-weight: bold; text-align: center;">Tweet Count for each POI</h2>
-               <div style="display: block ;text-align: center">  <!-- //Bar Graph -->
-                    <canvas baseChart 
-                      [datasets]="barChartData"
-                      [labels]="barChartLabels"
-                      [options]="barChartOptions"
-                      [colors]="barChartColors"
-                      [legend]="barChartLegend"
-                      [chartType]="barChartType">
-                    </canvas>
-                </div>
-                <h2 style="color: pink; font-weight: bold; text-align: center;">Top Hashtags and their Count</h2>
-                <div class="chart-wrapper" style="text-align: center;"> <!-- //Doughnut Chart -->
-                  <canvas baseChart 
-                  [data]="doughnutChartData_hashtag"
-                  [labels]="doughnutChartLabels_hashtag"
-                  [colors]="doughnutChartColors"
-                  [chartType]="doughnutChartType"
-                  [options]="lineChartOptions">
-                </canvas>
-              </div>
+              <h2 style="color: pink; font-weight: bold; text-align: center;">Sentiment Analysis on Tweets</h2>
+              <div class="chart-wrapper">  
+                <canvas baseChart 
+                [data]="pieChartData1" 
+                [labels]="pieChartLabels1" 
+                [chartType]="pieChartType"
+                [colors]="pieChartColors"
+                [options]="lineChartOptions"
+                [plugins]="pieChartPlugins"
+                [legend]="pieChartLegend">
+              </canvas>
+            </div> 
+                
             </div>
             
           </div>
         </div>
+        <div style="padding-top: 50px;"></div>
+        <h2 style="color: pink; font-weight: bold; text-align: center;">Word Cloud for Topics of Relevance</h2>
+        <div id="wordcloud"></div>
        
-        
+        <div style="padding-top: 50px;">
+          <h2 style="color: pink; font-weight: bold; text-align: center;">Top Hashtags and their Count</h2>
+          <div class="chart-wrapper" id="doughnut" style="text-align: center; margin-left: 366px;"> <!-- //Doughnut Chart -->
+            <canvas baseChart id="doughnut"
+            [data]="doughnutChartData_hashtag"
+            [labels]="doughnutChartLabels_hashtag"
+            [colors]="doughnutChartColors1"
+            [chartType]="doughnutChartType"
+            [options]="lineChartOptions1">
+          </canvas>
+        </div>
+      </div>
       
       </mat-tab>
-      <mat-tab label="Third" style="color: pink; font-size: 17px;"> Content 3 </mat-tab>
+      <mat-tab label="Replies" style="color: pink; font-size: 17px;"> 
+        <h2 style="color: green; font-weight: bold; text-align: center;padding-right: 68px;">Top Positive Reply</h2>
+        <mat-card>
+          <p><label style="color: #828283;">Tweet Text: &nbsp;&nbsp; </label>{{positiveTweet.reply_text}}</p>
+          <p><label style="color: #828283;">Sentiment Score: &nbsp;&nbsp; </label>{{positiveTweet.sentiment_score}}</p>
+          <p><label style="color: #828283;">Replied to Tweet: &nbsp;&nbsp; </label>{{positiveTweet.tweet_text}}</p>
+        </mat-card>
+        <h2 style="color: red; font-weight: bold; text-align: center;padding-right: 68px;">Top Negative Reply</h2>
+        <mat-card>
+          <p><label style="color: #828283;">Tweet Text: &nbsp;&nbsp; </label>{{negativeTweet.reply_text}}</p>
+          <p><label style="color: #828283;">Sentiment Score: &nbsp;&nbsp; </label>{{negativeTweet.sentiment_score}}</p>
+          <p><label style="color: #828283;">Replied to Tweet: &nbsp;&nbsp; </label>{{negativeTweet.tweet_text}}</p>
+        </mat-card>
+        <div style="padding-top: 50px;"></div>
+        <div class="container" style="text-align: center;">
+          <div class="row">
+            <div class="col-sm-12">
+        <h2 style="color: pink; font-weight: bold; text-align: center; padding-right: 68px;">Sentiment Analysis on Replies</h2>
+        <div class="chart-wrapper" style="margin-left: 262px;"> 
+          <canvas baseChart 
+          [data]="pieChartData" 
+          [labels]="pieChartLabels" 
+          [chartType]="pieChartType"
+          [colors]="pieChartColors"
+          [options]="lineChartOptions2"
+          [plugins]="pieChartPlugins"
+          [legend]="pieChartLegend">
+        </canvas>
+      </div> 
+            </div></div></div>
+
+
+      </mat-tab>
     </mat-tab-group>
     
    

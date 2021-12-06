@@ -8,11 +8,15 @@ import { MatIconModule } from '@angular/material/icon';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
+import {MatDividerModule} from '@angular/material/divider';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
 import { AppRoutingModule } from './app-routing.module';
 import { ChartsModule } from 'ng2-charts';
+import { HighchartsChartModule } from 'highcharts-angular';
+
 import { AppComponent } from './app.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -44,7 +48,9 @@ import { SearchComponent } from './search/search.component';
     MatExpansionModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
-    ChartsModule
+    MatDividerModule,
+    ChartsModule,
+    HighchartsChartModule,
   ],
   providers: [AppServiceService],
   bootstrap: [AppComponent]

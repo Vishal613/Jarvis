@@ -5,9 +5,12 @@ import { map } from 'rxjs/operators';
 
 
 
-const baseUrl = 'http://192.168.1.220:9999/search'
-const baseUrl2 = 'http://192.168.1.220:9999/search/countries'
-const baseUrl3 = 'http://192.168.1.220:9999/search/hashtags'
+const baseUrl = 'http://192.168.1.122:9999/search'
+const baseUrl2 = 'http://192.168.1.122:9999/search/countries'
+const baseUrl3 = 'http://192.168.1.122:9999/search/hashtags'
+const baseUrl4 = 'http://192.168.1.122:9999/topics'
+const baseUrl5 = 'http://192.168.1.122:9999/search/replies/sentiment'
+const baseUrl6 = 'http://192.168.1.122:9999/search/sentiment'
 
 @Injectable({
   providedIn: 'root'
@@ -18,41 +21,76 @@ export class AppServiceService {
   countryTerm:any;
   topicsTerm:any;
   languagesTerm:any;
+  start:any;
   $querySearchTerm =  new EventEmitter();
 
   constructor(private http: HttpClient) { }
 
-  searchQuery(val:string): Observable<any>{
+  searchQuery(val:string, start:number): Observable<any>{
     this.queryTerm =  val;
-      
-      const data = {
-        "queries": val,
-        "countries": "",
-        "poi_name": "",
-        "languages": ""
+    this.start = start;
+    if(!this.topicsTerm){
+      this.topicsTerm=null;
     }
-      console.log(data)
+    if(!this.countryTerm){
+      this.countryTerm=null;
+    }
+    if(!this.languagesTerm){
+      this.languagesTerm=null;
+    }
+      const data = {
+        "query": val,
+        "country": this.countryTerm,
+        "poi_name": this.topicsTerm,
+        "language": this.languagesTerm,
+        "start":start,
+        "rows":20
+    }
       this.$querySearchTerm.emit(val)
       return this.http.post(baseUrl, data);
+  }
+
+  sentimentAnalysis(val:string): Observable<any>{
+    console.log("inside sentiment server")
+    if(!this.topicsTerm){
+      this.topicsTerm=null;
+    }
+    if(!this.countryTerm){
+      this.countryTerm=null;
+    }
+    if(!this.languagesTerm){
+      this.languagesTerm=null;
+    }
+    const data = {
+      "query": this.queryTerm,
+      "country": this.countryTerm,
+      "poi_name": this.topicsTerm,
+      "language": this.languagesTerm,
+      "start":this.start,
+      "rows":20
+      
+  }
+  return this.http.post(baseUrl5, data);
   }
 
   searchCountryFilter(val:string): Observable<any>{
     this.countryTerm = val;
 
     if(!this.topicsTerm){
-      this.topicsTerm="";
+      this.topicsTerm=null;
     }
     if(!this.languagesTerm){
-      this.languagesTerm="";
+      this.languagesTerm=null;
     }
 
     const data = {
-      "queries": this.queryTerm,
-      "countries": val,
+      "query": this.queryTerm,
+      "country": val,
       "poi_name": this.topicsTerm,
-      "languages": this.languagesTerm
+      "language": this.languagesTerm,
+      "start":this.start,
+      "rows":20
   }
-    console.log(data)
     return this.http.post(baseUrl, data);
   }
 
@@ -60,19 +98,20 @@ export class AppServiceService {
     this.topicsTerm = val;
 
     if(!this.languagesTerm){
-      this.languagesTerm="";
+      this.languagesTerm=null;
     }
     if(!this.countryTerm){
-      this.countryTerm="";
+      this.countryTerm=null;
     }
 
     const data = {
-      "queries": this.queryTerm,
-      "countries": this.countryTerm,
+      "query": this.queryTerm,
+      "country": this.countryTerm,
       "poi_name": val,
-      "languages": this.languagesTerm
+      "language": this.languagesTerm,
+      "start":this.start,
+      "rows":20
   }
-    console.log(data)
     return this.http.post(baseUrl, data);
   }
 
@@ -80,49 +119,106 @@ export class AppServiceService {
     this.languagesTerm = val;
 
     if(!this.topicsTerm){
-      this.topicsTerm="";
+      this.topicsTerm=null;
     }
     if(!this.countryTerm){
-      this.countryTerm="";
+      this.countryTerm=null;
     }
+    
 
     const data = {
-      "queries": this.queryTerm,
-      "countries": this.countryTerm,
+      "query": this.queryTerm,
+      "country": this.countryTerm,
       "poi_name": this.topicsTerm,
-      "languages": val
+      "language": val,
+      "start":this.start,
+      "rows":20
   }
-    console.log(data)
     return this.http.post(baseUrl, data);
   }
 
    analysisCountry(val:string){   //doughnut chart for countries vs number of tweets
-    console.log("inside country server " + val)
-    const data = {
-      "queries": this.queryTerm,
-      "countries": "",
-      "poi": "",
-      "languages": ""
-  }
-    console.log(data)
+    if(!this.topicsTerm){
+      this.topicsTerm=null;
+    }
+    if(!this.countryTerm){
+      this.countryTerm=null;
+    }
+    if(!this.languagesTerm){
+      this.languagesTerm=null;
+    }
     
+    const data = {
+      "query": this.queryTerm,
+      "country": this.countryTerm,
+      "poi_name": this.topicsTerm,
+      "language": this.languagesTerm,
+      "start":0,
+      "rows":20
+  }
+
+  console.log("country server data for chart data")
+  console.log(data)
     return this.http.post(baseUrl2, data);
   }
 
   tophashtags(val:string){   //doughnut chart for countries vs number of tweets
-    console.log("inside hashtag server " + val)
+    if(!this.topicsTerm){
+      this.topicsTerm=null;
+    }
+    if(!this.countryTerm){
+      this.countryTerm=null;
+    }
+    if(!this.languagesTerm){
+      this.languagesTerm=null;
+    }
     const data = {
-      "queries": this.queryTerm,
-      "countries": "",
-      "poi": "",
-      "languages": ""
+      "query": this.queryTerm,
+      "country": this.countryTerm,
+      "poi_name": this.topicsTerm,
+      "language": this.languagesTerm,
+      "start":this.start,
+      "rows":20
   }
     
     return this.http.post(baseUrl3, data);
   }
 
-  getOverviewAnanlysis(){
-    return this.http.get(baseUrl2)
-      .pipe(map(res => res));
+  wordcloud(val:string){
+    if(!this.topicsTerm){
+      this.topicsTerm=null;
+    }
+    if(!this.countryTerm){
+      this.countryTerm=null;
+    }
+    if(!this.languagesTerm){
+      this.languagesTerm=null;
+    }
+    const data = {
+      "query": this.queryTerm,
+      "country": this.countryTerm,
+      "poi_name": this.topicsTerm,
+      "language": this.languagesTerm,
+      "start":this.start,
+      "rows":20
   }
+  console.log(data)
+    return this.http.post(baseUrl4, data);
+  }
+
+  searchTweetSentiment(val:string){
+    if(!this.countryTerm){
+      this.countryTerm=null;
+    }
+   
+    const data = {
+      "query": this.queryTerm,
+      "country": this.countryTerm,
+      "start":this.start,
+      "rows":20
+  }
+      return this.http.post(baseUrl6, data);
+  }
+
+
 }

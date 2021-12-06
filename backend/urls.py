@@ -181,6 +181,7 @@ def topics():
 def voice():
     list_country = ['india','usa','mexico']
     list_language = ['hindi','spanish','english']
+    lang_map = {'hindi':'hi', 'english':'en', 'spanish':'es'}
     recording = sr.Recognizer()
     language = ''
     country = ''
@@ -204,10 +205,15 @@ def voice():
             print('query: ',query)
             print('country: ',country)
             print('language: ',language)
+            if(country!=''):
+                country = country.upper()
+            if(language!=''):
+                language = language.lower()
+                language = lang_map[language]
             return {'query':query, 'country':country, 'language':language}
         except Exception as e:
             print(e)
             return {}
-
+        
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=9999)

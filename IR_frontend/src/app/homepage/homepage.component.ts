@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, OnInit, Type } from '@angular/core';
+
 import { AppServiceService } from 'src/app/app-service.service';
 import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { Subject, throwError, of } from 'rxjs';
@@ -23,6 +24,7 @@ declare var require: any;
 })
 export class HomepageComponent implements OnInit {
   panelOpenState = false;
+  voiceQueryTerm:any;
   loading: any;
   totalNum:any;
   tweetsData:any;
@@ -49,7 +51,7 @@ export class HomepageComponent implements OnInit {
   weight:any;
   arr:any =[];
   flag:any = false;
-  obj1 = {name:'', weight:0};
+  obj1:any;
 
   doughnutChartLabels:any = [];
   doughnutChartData:any =[];
@@ -353,6 +355,22 @@ openTwitter(name:string, id:string){
       error: error => console.log(console.error) 
     }
     ); 
+  }
+
+  voice(){
+    this.loading = true;
+    this.appService.voice()
+    .subscribe({
+      next:info =>{
+        this.obj1 = info;
+        this.voiceQueryTerm = this.obj1.query;
+        this.searchQuery(this.voiceQueryTerm,0);
+        this.searchCountryFilter(this.obj1.country);
+        this.searchLanguageFilter(this.obj1.language);
+
+      },
+      error: error => console.log(console.error) 
+    })
   }
   
   tabClick(event: MatTabChangeEvent) {

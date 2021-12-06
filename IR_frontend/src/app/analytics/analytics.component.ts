@@ -50,6 +50,7 @@ export class AnalyticsComponent implements AfterViewInit {
   }
 };
 
+
   public radarChartOptions: RadialChartOptions = {
     responsive: true,
     legend : {

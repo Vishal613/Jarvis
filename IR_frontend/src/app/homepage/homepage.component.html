@@ -1,4 +1,5 @@
 <html>
+
     <head>
         <base href="/">
     </head>
@@ -19,10 +20,10 @@
   <form class="formGroup">
     <mat-form-field class="example-full-width" appearance="fill">
       &nbsp;&nbsp;<mat-label class="font-size" for="query" style="color:azure">Query</mat-label>
-      <input matInput #query name="query" class="font-size" placeholder="Enter query for search" >
+      <input matInput #query name="query" class="font-size" placeholder="Enter query for search" >{{voiceQueryTerm}}
     </mat-form-field>
     &nbsp;&nbsp;
-     
+      <button type="button" style="width: 13%;" (click)="voice()">Voice</button>
       
       <button type="button" class="btn btn-outline-light btn-lg" formControlName="search" style="width: 13%;" (click)="searchQuery(query.value,0)">Search</button>
       <div> 

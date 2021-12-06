@@ -3,6 +3,11 @@ import flask
 from flask import request
 from views import get_tweets_from_solr, get_tweets_by_countries, get_tweets_by_languages, get_replies_tweets_sentiment, \
     get_top_hash_tags, get_topics, get_tweets_by_sentiment
+import speech_recognition as sr
+import nltk
+from nltk.corpus import stopwords
+nltk.download('stopwords')
+STOPWORDS = set(stopwords.words('english'))
 
 app = Flask(__name__)
 
@@ -177,5 +182,46 @@ def topics():
     return flask.jsonify(response)
 
 
+@app.route("/voice", methods=['POST'])
+def voice():
+    list_country = ['india','usa','mexico']
+    list_language = ['hindi','spanish','english']
+    lang_map = {'hindi':'hi', 'english':'en', 'spanish':'es'}
+    recording = sr.Recognizer()
+    language = ''
+    country = ''
+    with sr.Microphone() as source: 
+        recording.adjust_for_ambient_noise(source)
+        print("Please Say something:")
+        audio = recording.listen(source)
+        try:
+            speech = recording.recognize_google(audio)
+            print("You said: " + speech)
+            li = speech.split(' ')
+            query = list(li)
+            for i in li:
+                if(i.lower() in list_country):
+                    country = i
+                    query.remove(i)
+                if(i.lower() in list_language):
+                    language = i
+                    query.remove(i)
+            query = ' '.join(query)
+            print('query: ',query)
+            print('country: ',country)
+            print('language: ',language)
+            if(country!=''):
+                country = country.upper()
+            if(language!=''):
+                language = language.lower()
+                language = lang_map[language]
+            if(query!=''):
+                query =  ' '.join([word for word in query.split() if word not in STOPWORDS])
+            return {'query':query, 'country':country, 'language':language}
+        except Exception as e:
+            print(e)
+            return {}
+        
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=9999)
+

@@ -51,7 +51,7 @@ def countries():
         rows = request.json["rows"]
     if "additional_filters" in request.json:
         additional_filters = request.json["additional_filters"]
-    tweets,  = get_tweets_by_countries(query, country, poi_name, language, start, rows, additional_filters=additional_filters)
+    tweets = get_tweets_by_countries(query, country, poi_name, language, start, rows, additional_filters=additional_filters)
 
     response = {
         "response": tweets

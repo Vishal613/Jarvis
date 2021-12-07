@@ -17,15 +17,18 @@
       
     </mat-toolbar>
   </p>
+
   <form class="formGroup">
+
     <mat-form-field class="example-full-width" appearance="fill">
       &nbsp;&nbsp;<mat-label class="font-size" for="query" style="color:azure">Query</mat-label>
-      <input matInput #query name="query" class="font-size" placeholder="Enter query for search" >{{voiceQueryTerm}}
+      <input matInput #query name="query" class="font-size" placeholder="Enter query for search" >{{voiceQueryTerm}} {{voiceCountry}} {{voiceLanguage}}
     </mat-form-field>
     &nbsp;&nbsp;
-      <button type="button" style="width: 13%;" (click)="voice()">Voice</button>
-      
-      <button type="button" class="btn btn-outline-light btn-lg" formControlName="search" style="width: 13%;" (click)="searchQuery(query.value,0)">Search</button>
+    <button type="button" class="btn btn-outline-light btn-lg" formControlName="search" style="width: 13%;" (click)="searchQuery(query.value,0)">Search</button>
+    &nbsp;  
+    <button type="button" class="btn btn-outline-light btn-lg" style="width: 13%;" (click)="voice()">Voice Search</button>
+     
       <div> 
         <mat-accordion>
         <mat-expansion-panel (opened)="panelOpenState = true"
@@ -84,6 +87,9 @@
         <mat-option value="nsitharaman">nsitharaman</mat-option>
       </mat-select>
     </mat-form-field>
+    &nbsp;&nbsp;
+    <input type="checkbox" id="isCheckBox" (change)="yourfunc($event)" class="checkbox" />&nbsp;
+    <label for="isCheckBox" style="font-size: large;">Filter Disinformation</label>
   </mat-expansion-panel>
 </mat-accordion>
       
@@ -101,7 +107,7 @@
     <mat-tab-group (selectedTabChange)="tabClick($event)">
       <mat-tab label="Tweets" style="color: pink;font-size: 17px;"> 
         <div class="space"></div>
-        <b><h4 style="color: pink; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;Showing Top {{tweetsDataLength}} Tweets Related to {{searchTerm}}</h4></b>
+        <b><h4 style="color: pink; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;Showing Top {{tweetsDataLength}} Tweets From total {{totalNum}} Related to {{searchTerm}}</h4></b>
         <div style="margin-left: 15px !important;  margin-bottom: 10px;" (click)="onButtonGroupClick($event)">
           <button type="button" [disabled]="previousDisabled" class="btn btn-secondary" (click)="searchQuery(searchTerm,start-20)">Previous</button>
           <button type="button" class="btn btn-secondary active" (click)="searchQuery(searchTerm,0)">1</button>
@@ -114,7 +120,8 @@
           <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,140)">8</button>
           <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,160)">9</button>
           <button type="button" class="btn btn-secondary" (click)="searchQuery(searchTerm,180)">10</button>
-          <button type="button" [disabled]="nextDisabled" class="btn btn-secondary" (click)="searchQuery(searchTerm,start+20)">Next</button></div>
+          <button type="button" [disabled]="nextDisabled" class="btn btn-secondary" (click)="searchQuery(searchTerm,start+20)">Next</button>
+        </div>
         <div *ngFor="let i of tweetsData">
           <mat-card (click)="openTwitter(i['poi_name'], i['id'])" >
             <div *ngIf="i['verified']; else notverified">

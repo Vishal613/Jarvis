@@ -21,6 +21,8 @@ export class AppServiceService {
   topicsTerm:any;
   languagesTerm:any;
   start:any;
+  add_filter:boolean = false;
+  filter:any;
   $querySearchTerm =  new EventEmitter();
 
   constructor(private http: HttpClient) { }
@@ -37,13 +39,21 @@ export class AppServiceService {
     if(!this.languagesTerm){
       this.languagesTerm=null;
     }
+    if(this.add_filter){
+      this.filter = ["dis_info"]
+    }
+    else{
+      this.filter = null;
+    }
+
       const data = {
         "query": val,
         "country": this.countryTerm,
         "poi_name": this.topicsTerm,
         "language": this.languagesTerm,
         "start":start,
-        "rows":20
+        "rows":20,
+        "additional_filters":this.filter
     }
       this.$querySearchTerm.emit(val)
       return this.http.post(baseUrl, data);
@@ -60,13 +70,20 @@ export class AppServiceService {
     if(!this.languagesTerm){
       this.languagesTerm=null;
     }
+    if(this.add_filter){
+      this.filter = ["dis_info"]
+    }
+    else{
+      this.filter = null;
+    }
     const data = {
       "query": this.queryTerm,
       "country": this.countryTerm,
       "poi_name": this.topicsTerm,
       "language": this.languagesTerm,
       "start":this.start,
-      "rows":20
+      "rows":20,
+      "additional_filters":this.filter
       
   }
   return this.http.post(baseUrl5, data);
@@ -81,6 +98,12 @@ export class AppServiceService {
     if(!this.languagesTerm){
       this.languagesTerm=null;
     }
+    if(this.add_filter){
+      this.filter = ["dis_info"]
+    }
+    else{
+      this.filter = null;
+    }
 
     const data = {
       "query": this.queryTerm,
@@ -88,7 +111,8 @@ export class AppServiceService {
       "poi_name": this.topicsTerm,
       "language": this.languagesTerm,
       "start":this.start,
-      "rows":20
+      "rows":20,
+      "additional_filters":this.filter
   }
     return this.http.post(baseUrl, data);
   }
@@ -102,6 +126,12 @@ export class AppServiceService {
     if(!this.countryTerm){
       this.countryTerm=null;
     }
+    if(this.add_filter){
+      this.filter = ["dis_info"]
+    }
+    else{
+      this.filter = null;
+    }
 
     const data = {
       "query": this.queryTerm,
@@ -109,7 +139,8 @@ export class AppServiceService {
       "poi_name": val,
       "language": this.languagesTerm,
       "start":this.start,
-      "rows":20
+      "rows":20,
+      "additional_filters":this.filter
   }
     return this.http.post(baseUrl, data);
   }
@@ -123,7 +154,12 @@ export class AppServiceService {
     if(!this.countryTerm){
       this.countryTerm=null;
     }
-    
+    if(this.add_filter){
+      this.filter = ["dis_info"]
+    }
+    else{
+      this.filter = null;
+    }
 
     const data = {
       "query": this.queryTerm,
@@ -131,9 +167,43 @@ export class AppServiceService {
       "poi_name": this.topicsTerm,
       "language": val,
       "start":this.start,
-      "rows":20
+      "rows":20,
+      "additional_filters":this.filter
   }
     return this.http.post(baseUrl, data);
+  }
+
+  additional_filter(filter:boolean): Observable<any>{
+    this.add_filter = filter;
+    if(!this.topicsTerm){
+      this.topicsTerm=null;
+    }
+    if(!this.countryTerm){
+      this.countryTerm=null;
+    }
+    if(!this.languagesTerm){
+      this.languagesTerm=null;
+    }
+    if(this.add_filter){
+      this.filter = ["dis_info"]
+    }
+    else{
+      this.filter = null;
+    }
+    const data = {
+      "query": this.queryTerm,
+      "country": this.countryTerm,
+      "poi_name": this.topicsTerm,
+      "language": this.languagesTerm,
+      "start":this.start,
+      "rows":20,
+      "additional_filters":this.filter
+  }
+
+  console.log("country server data for chart data")
+  console.log(data)
+    return this.http.post(baseUrl, data);
+    
   }
 
    analysisCountry(val:string){   //doughnut chart for countries vs number of tweets
@@ -146,6 +216,12 @@ export class AppServiceService {
     if(!this.languagesTerm){
       this.languagesTerm=null;
     }
+    if(this.add_filter){
+      this.filter = ["dis_info"]
+    }
+    else{
+      this.filter = null;
+    }
     
     const data = {
       "query": this.queryTerm,
@@ -153,7 +229,8 @@ export class AppServiceService {
       "poi_name": this.topicsTerm,
       "language": this.languagesTerm,
       "start":0,
-      "rows":20
+      "rows":20,
+      "additional_filters":this.filter
   }
 
   console.log("country server data for chart data")
@@ -171,13 +248,20 @@ export class AppServiceService {
     if(!this.languagesTerm){
       this.languagesTerm=null;
     }
+    if(this.add_filter){
+      this.filter = ["dis_info"]
+    }
+    else{
+      this.filter = null;
+    }
     const data = {
       "query": this.queryTerm,
       "country": this.countryTerm,
       "poi_name": this.topicsTerm,
       "language": this.languagesTerm,
       "start":this.start,
-      "rows":20
+      "rows":20,
+      "additional_filters":this.filter
   }
     
     return this.http.post(baseUrl3, data);
@@ -193,13 +277,20 @@ export class AppServiceService {
     if(!this.languagesTerm){
       this.languagesTerm=null;
     }
+    if(this.add_filter){
+      this.filter = ["dis_info"]
+    }
+    else{
+      this.filter = null;
+    }
     const data = {
       "query": this.queryTerm,
       "country": this.countryTerm,
       "poi_name": this.topicsTerm,
       "language": this.languagesTerm,
       "start":this.start,
-      "rows":20
+      "rows":20,
+      "additional_filters":this.filter
   }
   console.log(data)
     return this.http.post(baseUrl4, data);
@@ -209,12 +300,19 @@ export class AppServiceService {
     if(!this.countryTerm){
       this.countryTerm=null;
     }
+    if(this.add_filter){
+      this.filter = ["dis_info"]
+    }
+    else{
+      this.filter = null;
+    }
    
     const data = {
       "query": this.queryTerm,
       "country": this.countryTerm,
       "start":this.start,
-      "rows":20
+      "rows":20,
+      "additional_filters":this.filter
   }
       return this.http.post(baseUrl6, data);
   }
@@ -226,6 +324,7 @@ export class AppServiceService {
       "start":this.start,
       "rows":20
   }
+    
     return this.http.post(baseUrl7, data)
   }
 

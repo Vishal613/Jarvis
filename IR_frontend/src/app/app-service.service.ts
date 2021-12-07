@@ -3,13 +3,13 @@ import { HttpClient , HttpClientModule} from '@angular/common/http';
 import { Observable, observable, of} from 'rxjs';
 import { map } from 'rxjs/operators';
 
-const baseUrl = 'http://192.168.1.122:9999/search'
-const baseUrl2 = 'http://192.168.1.122:9999/search/countries'
-const baseUrl3 = 'http://192.168.1.122:9999/search/hashtags'
-const baseUrl4 = 'http://192.168.1.122:9999/topics'
-const baseUrl5 = 'http://192.168.1.122:9999/search/replies/sentiment'
-const baseUrl6 = 'http://192.168.1.122:9999/search/sentiment'
-const baseUrl7 = 'http://192.168.1.122:9999/voice'
+const baseUrl = 'http://192.168.1.160:9999/search'
+const baseUrl2 = 'http://192.168.1.160:9999/search/countries'
+const baseUrl3 = 'http://192.168.1.160:9999/search/hashtags'
+const baseUrl4 = 'http://192.168.1.160:9999/topics'
+const baseUrl5 = 'http://192.168.1.160:9999/search/replies/sentiment'
+const baseUrl6 = 'http://192.168.1.160:9999/search/sentiment'
+const baseUrl7 = 'http://192.168.1.160:9999/voice'
 
 @Injectable({
   providedIn: 'root'
@@ -91,6 +91,9 @@ export class AppServiceService {
 
   searchCountryFilter(val:string): Observable<any>{
     this.countryTerm = val;
+    if(!this.countryTerm){
+      this.countryTerm=null;
+    }
 
     if(!this.topicsTerm){
       this.topicsTerm=null;
@@ -107,7 +110,7 @@ export class AppServiceService {
 
     const data = {
       "query": this.queryTerm,
-      "country": val,
+      "country": this.countryTerm,
       "poi_name": this.topicsTerm,
       "language": this.languagesTerm,
       "start":this.start,
@@ -119,6 +122,9 @@ export class AppServiceService {
 
   searchTopicsFilter(val:string): Observable<any>{
     this.topicsTerm = val;
+    if(!this.topicsTerm){
+      this.topicsTerm=null;
+    }
 
     if(!this.languagesTerm){
       this.languagesTerm=null;
@@ -136,7 +142,7 @@ export class AppServiceService {
     const data = {
       "query": this.queryTerm,
       "country": this.countryTerm,
-      "poi_name": val,
+      "poi_name": this.topicsTerm,
       "language": this.languagesTerm,
       "start":this.start,
       "rows":20,
@@ -147,6 +153,9 @@ export class AppServiceService {
 
   searchLanguageFilter(val:string): Observable<any>{
     this.languagesTerm = val;
+    if(!this.languagesTerm){
+      this.languagesTerm=null;
+    }
 
     if(!this.topicsTerm){
       this.topicsTerm=null;
@@ -165,7 +174,7 @@ export class AppServiceService {
       "query": this.queryTerm,
       "country": this.countryTerm,
       "poi_name": this.topicsTerm,
-      "language": val,
+      "language": this.languagesTerm,
       "start":this.start,
       "rows":20,
       "additional_filters":this.filter

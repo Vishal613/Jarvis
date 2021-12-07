@@ -25,6 +25,8 @@ declare var require: any;
 export class HomepageComponent implements OnInit {
   panelOpenState = false;
   voiceQueryTerm:any;
+  voiceCountry:any;
+  voiceLanguage:any;
   loading: any;
   totalNum:any;
   tweetsData:any;
@@ -51,6 +53,7 @@ export class HomepageComponent implements OnInit {
   weight:any;
   arr:any =[];
   flag:any = false;
+  additional_filter_flag = false;
   obj1:any;
 
   doughnutChartLabels:any = [];
@@ -356,14 +359,59 @@ openTwitter(name:string, id:string){
     }
     ); 
   }
+  yourfunc(e:any) {
+    if (e.target.checked) {
+      this.additional_filter_flag = true 
+      this.loading = true;
+      this.appService.additional_filter(true)
+      .subscribe({
+        next:info => {
+          this.totalNum = info.total_num
+          this.tweetsData= info.response
+           this.tweetsDataLength = this.tweetsData.length
+      },
+        
+        error: error => console.log(console.error) 
+      }
+      );  
+      this.analysisCountry();
+    }
+    else{
+      this.additional_filter_flag = false 
+      this.loading = true;
+      this.appService.additional_filter(false)
+      .subscribe({
+        next:info => {
+          this.totalNum = info.total_num
+          this.tweetsData= info.response
+           this.tweetsDataLength = this.tweetsData.length
+      },
+        
+        error: error => console.log(console.error) 
+      }
+      );  
+      this.analysisCountry();
+    }
+ }
 
   voice(){
+
     this.loading = true;
     this.appService.voice()
     .subscribe({
       next:info =>{
         this.obj1 = info;
         this.voiceQueryTerm = this.obj1.query;
+        this.voiceCountry = this.obj1.country;
+        if(this.obj1.language=="en"){
+          this.voiceLanguage = "English"
+        }
+        if(this.obj1.language == "hi"){
+          this.voiceLanguage = "Hindi"
+        }
+        if(this.obj1.language == "es"){
+          this.voiceLanguage = "Spanish"
+        }
         this.searchQuery(this.voiceQueryTerm,0);
         this.searchCountryFilter(this.obj1.country);
         this.searchLanguageFilter(this.obj1.language);

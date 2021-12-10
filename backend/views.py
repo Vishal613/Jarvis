@@ -12,8 +12,8 @@ from query_processor import Query_Processor
 # CORE_NAME = "IRF21P4"
 # AWS_IP = "18.118.132.49"
 
-CORE_NAME = "Project4"
-AWS_IP = "18.118.138.7"
+CORE_NAME = "IRF21P4"
+AWS_IP = "18.118.132.49"
 
 DIS_INFO_CORE_NAME = "DIS_INFO"
 DIS_INFO_AWS_IP = "18.118.132.49"

@@ -4,12 +4,15 @@ from flask import request
 from views import get_tweets_from_solr, get_tweets_by_countries, get_tweets_by_languages, get_replies_tweets_sentiment, \
     get_top_hash_tags, get_topics, get_tweets_by_sentiment
 import speech_recognition as sr
+from flask_cors import CORS
 import nltk
 from nltk.corpus import stopwords
 nltk.download('stopwords')
 STOPWORDS = set(stopwords.words('english'))
 
 app = Flask(__name__)
+
+CORS(app)
 
 
 @app.route("/search", methods=['POST'])
